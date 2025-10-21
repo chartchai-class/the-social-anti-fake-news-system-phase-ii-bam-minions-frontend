@@ -1,8 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <h1 class="text-red-700">You did it!</h1>
-  
+  <div id="app">
+    <router-view />
+  </div>
 </template>
 
 <style scoped></style>

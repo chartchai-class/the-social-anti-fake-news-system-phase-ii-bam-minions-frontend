@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
+import type { UserReporter } from '@/types'
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -15,12 +16,13 @@ const apiClient: AxiosInstance = axios.create({
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null as string | null,
-    // user: null as Organizer | null,
+    user: null as UserReporter | null,
+
   }),
   getters: {
-    // currentUserName(): string {
-    //   return this.user?.name || ''
-    // },
+    currentUserName(): string {
+      return this.user?.firstname || ''
+    },
     authorizationHeader(): string {
       return `Bearer ${this.token}`
     },
@@ -37,23 +39,24 @@ export const useAuthStore = defineStore('auth', {
         })
         .then((response) => {
           this.token = response.data.access_token
-        //   this.user = response.data.user
+          this.user = response.data.user
+
           console.log(this.user)
           localStorage.setItem('access_token', this.token as string)
-        //   localStorage.setItem('user', JSON.stringify(this.user))
+          localStorage.setItem('user', JSON.stringify(this.user))
           return response
         })
     },
 
-    // reload(token: string, user: Organizer) {
-    //   this.token = token
-    //   this.user = user
-    // },
+    reload(token: string, user: UserReporter) {
+      this.token = token
+      this.user = user
+    },
 
     logout() {
       console.log('logout')
       this.token = null
-    //   this.user = null
+      this.user = null
       localStorage.removeItem('access_token')
       localStorage.removeItem('user')
     },

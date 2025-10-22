@@ -1,7 +1,11 @@
 import LoginView from '@/views/auth/LoginView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
 import NewsView from '@/views/NewsView.vue'
+import NewsDetailView from '@/views/News/NewsDetailView.vue'
+import NewsService from '@/services/NewsService'
+import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'
+import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +23,31 @@ const router = createRouter({
         }
       },
     },
+    {
+      path: '/news/:id',
+      name: 'news-detail',
+      component: NewsLayoutView,
+      props: true,
+      beforeEnter: (to) => {
+        const id = parseInt(to.params.id as string)
+        const newsStore = useNewsStore()
+        return NewsService.getNew(id)
+          .then((response) => {
+            //setup the data for event
+            newsStore.setNews(response.data)})
+          .catch((error) => {
+            console.error('Error fetching news:', error)
+          })
+      },
+      children: [
+        {
+          path: '',
+          name: 'news-detail-view',
+          component: NewsDetailView,
+          props: true,
+        },
+      ]
+  },
     {
       path: '/login',
       name: 'login',

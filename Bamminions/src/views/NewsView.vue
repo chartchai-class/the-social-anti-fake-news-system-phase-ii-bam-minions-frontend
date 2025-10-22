@@ -31,7 +31,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="container mx-auto p-4">
+    <div class="pt-8 pb-16 min-h-screen bg-gradient-to-b from-gray-700 to-gray-900">
         <NewsCard v-for="newsItem in newsList" :key="newsItem.id" :news="newsItem" />
     </div>
 </template>

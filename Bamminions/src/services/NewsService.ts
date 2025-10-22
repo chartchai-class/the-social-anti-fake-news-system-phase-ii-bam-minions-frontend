@@ -1,12 +1,18 @@
-import AxiosClient from "@/services/AxiosCLient"; 
-import { type News } from "@/types"; 
-import type { AxiosResponse } from "axios";
-
-
-function getNews(): Promise<AxiosResponse<News[]>> {
-    return AxiosClient.get<News[]>('/news'); 
-}
+import type { News as NewsType } from '@/types'
+import apiClient from './AxiosCLient'
 
 export default {
-    getNews
-};
+  getNews(perPage: number, page: number) {
+    return apiClient.get('/news?_limit=' + perPage + '&_page=' + page)
+  },
+
+  getNew(id: number) {
+    return apiClient.get('/news/' + id)
+  },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  saveNews(news: NewsType) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, ...newsData } = news
+    return apiClient.post('/news', newsData)
+  },
+}

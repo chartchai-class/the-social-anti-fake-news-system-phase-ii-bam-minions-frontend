@@ -16,3 +16,12 @@ export interface Comment{
 export interface NewsState{
   news: News | null;
 }
+
+export interface UserReporter {
+  id: number
+  firstname: string
+  lastname: string
+  email: string
+  imageUrl?: string | null
+}
+

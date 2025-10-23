@@ -7,19 +7,24 @@ const { news } = storeToRefs(store)
 </script>
 
 <template>
-  <div v-if="news" class="p-6 max-w-3xl mx-auto text-gray-800">
-    <h1 class="text-3xl font-bold mb-4">{{ news.topic }}</h1>
-    <nav class="mb-6 flex gap-4 text-black-700 font-medium justify-center">
+  <div v-if="news" class="p-12 mx-auto text-gray-800">
+    <nav class="mb-8 flex justify-center gap-4">
       <router-link
-        :to="{ name: 'news-detail-view' }"
-        class="hover:underline"
-        exact-active-class="text-green-500"
+        :to="{ name: 'news-detail-view', params: { id: $route.params.id } }"
+        class="group relative w-50 h-25 rounded-2xl border border-gray-300 bg-white/70 backdrop-blur ring-1 ring-black/5 hover:shadow transition"
+        exact-active-class="!border-gray-300 !ring-gray-200"
       >
-        Details
+        <span
+          class="absolute top-1 left-1 h-10 w-14 rounded-full bg-white shadow transition-transform duration-300 group-[.router-link-exact-active]:translate-x-16"
+        ></span>
+        <span
+          class="pointer-events-none absolute inset-0 grid place-items-center font-semibold text-xl md:text-2xl text-gray-800"
+        >
+          Detail
+        </span>
       </router-link>
-
-      <span>|</span>
     </nav>
+
     <router-view :news="news"></router-view>
   </div>
 </template>

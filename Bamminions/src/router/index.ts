@@ -6,6 +6,7 @@ import NewsService from '@/services/NewsService'
 import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'
 import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
+import NewsVoteView from '@/views/News/NewsVoteView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,12 @@ const router = createRouter({
           path: '',
           name: 'news-detail-view',
           component: NewsDetailView,
+          props: true,
+        },
+        {
+          path: 'vote',
+          name: 'news-vote-view',
+          component: NewsVoteView,
           props: true,
         },
       ]

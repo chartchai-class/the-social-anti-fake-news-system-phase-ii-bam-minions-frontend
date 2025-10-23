@@ -58,20 +58,5 @@ function logout() {
         </a>
       </li>
     </ul>
-
-    <div class="space-x-6 hidden md:block">
-      <router-link
-        :to="{ name: 'news-view' }"
-        class="px-3 py-1 hover:bg-gray-700 rounded transition-colors duration-200"
-      >
-        Home
-      </router-link>
-      <router-link
-        :to="{ name: 'news-view' }"
-        class="px-3 py-1 hover:bg-gray-700 rounded transition-colors duration-200"
-      >
-        Contact
-      </router-link>
-    </div>
   </nav>
 </template>

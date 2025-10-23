@@ -17,8 +17,10 @@ export type NewsStatus = 'UNVERIFIED' | 'FAKE' | 'NOT_FAKE' | 'TIE'
 export interface Comment{
     id: number;
     content: string;
-    create_at: string;
+    created_at: string;
     usercomment: UserReporter
+    voteLabel: 'FAKE' | 'NOT_FAKE'
+     
 }
 
 export interface NewsState{

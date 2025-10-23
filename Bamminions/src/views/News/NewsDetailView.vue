@@ -1,17 +1,49 @@
 <script setup lang="ts">
-import { defineProps, toRefs } from 'vue'
-import { type News } from '@/types'
+import { ref, computed, onMounted, watchEffect } from 'vue'
+import CommentService from '@/services/CommentService'
+import type { Comment , News } from '@/types'
+import CommentCard from '@/components/CommentCrad.vue'
+
 
 const props = defineProps<{
   news: News
-  topic: string
+  page: number
+  pageSize: number
 }>()
 
-const { news } = toRefs(props)
-console.log(news.value)
+
+const comments = ref<Comment[]>([])
+
+const total = ref(0)
+
+const page = computed(() => props.page)
+const pageSize = computed(() => props.pageSize)
+const hasNextPage = computed(() => {
+  const totalPages = Math.ceil(total.value / pageSize.value)
+  return page.value < totalPages
+})
+
+function loadComments() {
+  CommentService.getByNews(props.news.id, pageSize.value, page.value)
+    .then((res) => {
+      comments.value = res.data
+      total.value = Number(res.headers['x-total-count'] || 0)
+    })
+    .catch((err) => {
+      console.error('loadComments error:', err)
+    })
+}
+
+onMounted(() => {
+  watchEffect(() => {
+    loadComments()
+  })
+})
+
 </script>
 
 <template>
+  
   <div class="bg-gradient-to-b to-white flex items-center justify-center px-4 py-8">
     <div
       class="w-full max-w-6xl xl:max-w-7xl rounded-2xl bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden"
@@ -35,6 +67,9 @@ console.log(news.value)
           >
             {{ news.comments?.length ?? 0 }} comments
           </span>
+
+
+
         </div>
 
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
@@ -74,5 +109,12 @@ console.log(news.value)
         </p>
       </div>
     </div>
+     <div class="px-6 md:px-8 pb-8 space-y-4">
+    <CommentCard
+      v-for="c in comments"
+      :key="c.id"
+      :comment="c"
+    />
+  </div>
   </div>
 </template>

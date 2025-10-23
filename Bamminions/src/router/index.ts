@@ -44,7 +44,10 @@ const router = createRouter({
           path: '',
           name: 'news-detail-view',
           component: NewsDetailView,
-          props: true,
+          props: (route) =>({
+            page: parseInt((route.query.page as string) || '1'),
+            pageSize: parseInt((route.query.pageSize as string) || '5'),
+          }),
         },
       ]
   },

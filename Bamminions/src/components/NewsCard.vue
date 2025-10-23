@@ -18,6 +18,9 @@ defineProps<{
                 <h2 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
                     {{ news.topic }}
                 </h2>
+                <h2 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
+                    {{ news.status }}
+                </h2>
                 <div class="flex items-center text-sm font-medium opacity-80">
                     <span class="mr-3">Author Name : </span> 
                     <span>Time: {{ news.created_at }}</span>
@@ -31,7 +34,9 @@ defineProps<{
         <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight">
             {{ news.topic }}
         </h2>
-        
+        <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight">
+            {{ news.status }}
+        </h2>
         <p class="text-sm text-gray-600 mb-3">
             {{ news.short_detail }}
         </p>

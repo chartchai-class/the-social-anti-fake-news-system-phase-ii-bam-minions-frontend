@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watchEffect } from 'vue'
 import CommentService from '@/services/CommentService'
-import type { Comment , News } from '@/types'
-import CommentCard from '@/components/CommentCrad.vue'
-
+import type { Comment, News } from '@/types'
+import CommentCard from '@/components/CommentCard.vue'
 
 const props = defineProps<{
   news: News
   page: number
   pageSize: number
 }>()
-
 
 const comments = ref<Comment[]>([])
 
@@ -39,83 +37,59 @@ onMounted(() => {
     loadComments()
   })
 })
-
 </script>
 
 <template>
-  
-  <div class="bg-gradient-to-b to-white flex items-center justify-center px-4 py-8">
+  <div class="flex justify-center px-4 py-8">
     <div
-      class="w-full max-w-6xl xl:max-w-7xl rounded-2xl bg-white/90 backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden"
+      class="w-full max-w-6xl xl:max-w-7xl rounded-2xl backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden"
     >
-      <!-- Header -->
       <div class="p-6 md:p-8 space-y-4">
-        <!-- Chips -->
         <div class="flex flex-wrap items-center gap-2">
           <span
             class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
           >
-            {{ news.created_at }}
+            Post by {{ news.reporter.firstname }} {{ news.reporter.lastname }}
           </span>
           <span
             class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
           >
-            {{ news.reporter.firstname }}
+            Post on {{ news.created_at }}
           </span>
-          <span
-            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
-          >
-            {{ news.comments?.length ?? 0 }} comments
-          </span>
-
-
-
         </div>
-
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
           {{ news.topic }}
         </h1>
-        <p class="text-gray-600 leading-relaxed">
-          {{ news.short_detail }}
-        </p>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <div
-            class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm text-emerald-700"
-          >
-            Reliable <span class="font-semibold">{{ news.notFakeCount }}</span>
-          </div>
-          <div
-            class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-1.5 text-sm text-red-700"
-          >
-            Fake <span class="font-semibold">{{ news.fakeCount }}</span>
-          </div>
-        </div>
       </div>
 
-      <!-- Image -->
       <div class="px-6 md:px-8 mb-6">
         <img
-        v-if="news.image && news.image.length > 0"
-        :src="news.image[0]"
-        alt="News Image"
-        class="w-full h-auto rounded-lg shadow"
+          v-if="news.image && news.image.length > 0"
+          :src="news.image[0]"
+          alt="News Image"
+          class="w-full h-auto rounded-lg shadow"
         />
       </div>
+      <div class="px-6 md:px-8 mb-6">
+        <h1 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
+          {{ news.short_detail }}
+        </h1>
+      </div>
 
-      <!-- Body -->
       <div class="px-6 md:px-8 pb-8">
         <p class="text-gray-800 leading-relaxed">
           {{ news.detail }}
         </p>
       </div>
     </div>
-     <div class="px-6 md:px-8 pb-8 space-y-4">
-    <CommentCard
-      v-for="c in comments"
-      :key="c.id"
-      :comment="c"
-    />
-  </div>
+
+    <div class="ml-8">
+      <h2 class="text-base md:text-lg font-bold tracking-tight text-white text-center py-2">
+        Comments
+      </h2>
+      <div class="space-y-2">
+        <CommentCard v-for="c in comments" :key="c.id" :comment="c" />
+      </div>
+    </div>
   </div>
 </template>

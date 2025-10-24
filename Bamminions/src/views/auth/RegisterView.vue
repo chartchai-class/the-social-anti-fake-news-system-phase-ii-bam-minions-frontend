@@ -7,6 +7,7 @@ const authStore = useAuthStore()
 
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const messageStore = useMessageStore()
 const router = useRouter()
@@ -15,6 +16,7 @@ const validationSchema = yup.object({
   lastname: yup.string().required('The last name is required'),
   email: yup.string().required('The email is required'),
   password: yup.string().required('The password is required'),
+  image: yup.array(yup.string()).max(1),
 })
 
 const { errors, handleSubmit } = useForm({
@@ -24,6 +26,7 @@ const { errors, handleSubmit } = useForm({
     lastname: '',
     email: '',
     password: '',
+    image: [],
   },
 })
 
@@ -31,9 +34,10 @@ const { value: firstname } = useField<string>('firstname')
 const { value: lastname } = useField<string>('lastname')
 const { value: email } = useField<string>('email')
 const { value: password } = useField<string>('password')
+const { value: image } = useField<string[]>('image')
 const onSubmit = handleSubmit((values) => {
   authStore
-    .register(values.firstname, values.lastname, values.email, values.password)
+    .register(values.firstname, values.lastname, values.email, values.password , values.image)
     .then(() => {
       console.log('Registration successful')
       router.push({ name: 'login' })
@@ -123,6 +127,8 @@ const onSubmit = handleSubmit((values) => {
             :error="errors['password']"
           />
         </div>
+
+        <ImageUpload v-model="image" />
 
         <!-- Submit Button -->
         <div>

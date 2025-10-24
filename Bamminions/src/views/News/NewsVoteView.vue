@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
-import { type News } from '@/types'
+
+import { ref } from 'vue'
+import VoteService from '@/services/VoteService'
+import type { VoteLabel, VoteRequest , News} from '@/types'
 
 const props = defineProps<{
   news: News
 }>()
+
 </script>
+
 
 <template>
   <div class="p-6">

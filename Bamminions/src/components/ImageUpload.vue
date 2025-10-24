@@ -1,41 +1,55 @@
 <script setup lang="ts">
 import Uploader from 'vue-media-upload'
-import { computed, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
-const authorizeHeader = computed(() => ({
-  Authorization: authStore.authorizationHeader,
-}))
-
-interface Props {
-  modelValue?: string[]
-}
+import { ref, watch } from 'vue'
 
 type MediaItem = { name: string }
 
+interface Props {
+  modelValue?: string[] | string | null
+}
+
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => [],
+  modelValue: () => []
 })
 
-const convertStringToMedia = (str: string[]): MediaItem[] => {
-  return str.map((element: string) => ({ name: element }))
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: string[]): void
+}>()
+
+function normalizeToArray(v: unknown): string[] {
+  if (Array.isArray(v)) return v.filter((x): x is string => typeof x === 'string')
+  if (typeof v === 'string') return v ? [v] : []
+  return []
 }
 
-const emit = defineEmits(['update:modelValue'])
-
-const convertMediaToString = (media: MediaItem[]): string[] => {
-  return media.map((m) => m.name)
+function toMedia(list: string[]): MediaItem[] {
+  return list.map((name) => ({ name }))
 }
 
-const media = ref<MediaItem[]>(convertStringToMedia(props.modelValue))
+function toStringList(media: MediaItem[] | unknown): string[] {
+  if (!Array.isArray(media)) return []
+  return media
+    .map((m) => (m && typeof m === 'object' && 'name' in m ? (m as MediaItem).name : null))
+    .filter((x): x is string => typeof x === 'string')
+}
+
+const media = ref<MediaItem[]>([])
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    media.value = toMedia(normalizeToArray(val))
+  },
+  { immediate: true }
+)
+
 const uploadUrl = ref(import.meta.env.VITE_UPLOAD_URL)
 
-const onChanged = (files: MediaItem[]) => {
-  emit('update:modelValue', convertMediaToString(files))
+function onChanged(files: MediaItem[]) {
+  emit('update:modelValue', toStringList(files))
 }
 </script>
 
 <template>
-  <Uploader :server="uploadUrl" @change="onChanged" :media="media" :headers="authorizeHeader" />
+  <Uploader :server="uploadUrl" :media="media" @change="onChanged" />
 </template>

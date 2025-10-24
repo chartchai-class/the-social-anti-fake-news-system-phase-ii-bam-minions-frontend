@@ -21,8 +21,12 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     currentUserName(): string {
-      return this.user?.firstname || ''
+      return this.user?.firstname || '' 
     },
+    currentUserImage(): string[]{
+      return this.user?.image || ''
+    },
+    
     authorizationHeader(): string {
       return `Bearer ${this.token}`
     },
@@ -61,13 +65,14 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('user')
     },
 
-    register(firstname: string, lastname: string, email: string, password: string) {
+    register(firstname: string, lastname: string, email: string, password: string , image: string[]) {
       return apiClient
         .post('/api/v1/auth/register', {
           firstname: firstname,
           lastname: lastname,
           email: email,
           password: password,
+          image: image,
         })
         .then((response) => {
           console.log('Registered', response)

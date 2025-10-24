@@ -14,13 +14,14 @@ export interface News{
 
 export type NewsStatus = 'UNVERIFIED' | 'FAKE' | 'NOT_FAKE' | 'TIE'
 
+export type VoteLabel = 'FAKE' | 'NOT_FAKE'
+
 export interface Comment{
     id: number;
     content: string;
     created_at: string;
     usercomment: UserReporter
-    voteLabel: 'FAKE' | 'NOT_FAKE'
-     
+    voteLabel: VoteLabel
 }
 
 export interface NewsState{
@@ -33,5 +34,17 @@ export interface UserReporter {
   lastname: string
   username: string
   email: string
-  imageUrl?: string | null
+  image: string[]
+}
+
+export interface VoteRequest {
+  label: VoteLabel
+  content: string
+}
+
+export interface VoteResponse {
+  fakeCount: number
+  notFakeCount: number
+  myVote: VoteLabel | null
+  comment: Comment
 }

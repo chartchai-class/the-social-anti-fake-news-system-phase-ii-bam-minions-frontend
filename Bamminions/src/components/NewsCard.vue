@@ -5,6 +5,7 @@ defineProps<{
   news: News
   isFeatured?: boolean
 }>()
+
 </script>
 
 <template>
@@ -31,6 +32,16 @@ defineProps<{
         <h2 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
           {{ news.topic }}
         </h2>
+
+           <div class="flex flex-row flew-wrap justify-center">
+    <img
+      v-for="image in news.image"
+      :key="image"
+      :src="image"
+      alt="events image"
+      class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
+    />
+  </div>
         <h2 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
           {{ news.status }}
         </h2>
@@ -38,6 +49,7 @@ defineProps<{
           <span class="mr-3">Author Name : </span>
           <span>Time: {{ news.created_at }}</span>
         </div>
+        
       </div>
     </div>
 
@@ -66,6 +78,16 @@ defineProps<{
             {{ news.detail }}
           </p>
         </div>
+
+        <div class="flex flex-row flew-wrap justify-center">
+    <img
+      v-for="image in news.image"
+      :key="image"
+      :src="image"
+      alt="events image"
+      class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
+    />
+  </div>
       </div>
     </div>
   </router-link>

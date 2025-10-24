@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { type News } from '@/types'
+import { computed } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   news: News
   isFeatured?: boolean
 }>()
+
+const displayStatus = computed(() => {
+  if (props.news.status === 'NOT_FAKE') return 'REAL'
+  if (props.news.status === 'FAKE') return 'FAKE'
+  return 'UNKNOWN'
+})
 
 </script>
 
@@ -13,81 +20,70 @@ defineProps<{
     :to="{ name: 'news-detail-view', params: { id: news.id } }"
     class="no-underline w-full"
   >
-    <div class="flex flex-row flew-wrap justify-center">
-      <img
-        v-for="image in news.image"
-        :key="image"
-        :src="image"
-        alt="events image"
-        class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
-      />
-    </div>
-    <div
+      <div
       v-if="isFeatured"
-      class="h-96 relative bg-cover bg-center text-white p-6 flex items-end rounded-xl shadow-2xl transition-shadow duration-300 hover:shadow-3xl"
-    >
-      <div class="absolute inset-0 bg-black opacity-50 rounded-xl"></div>
-
+      class="relative h-[480px] bg-cover bg-center text-black p-6 flex items-end rounded-xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300"
+      :style="{ backgroundImage: `url(${news.image?.[0]})` }"
+      >
+      <div class="absolute inset-0 bg-opacity-50 rounded-xl"></div>
       <div class="relative z-10 w-full">
-        <h2 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
+        <div class="flex items-center space-x-3 mb-3">
+          <span
+          class="text-xs font-semibold px-2 py-1 rounded uppercase"
+          :class="{
+          'bg-green-600 text-white': displayStatus === 'REAL',
+          'bg-red-600 text-white': displayStatus === 'FAKE',
+          'bg-gray-400 text-white': displayStatus === 'UNKNOWN'
+          }"
+          >
+          {{ displayStatus }}
+          </span>
+          <span class="text-sm opacity-80">{{ news.created_at }}</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
           {{ news.topic }}
         </h2>
-
-           <div class="flex flex-row flew-wrap justify-center">
-    <img
-      v-for="image in news.image"
-      :key="image"
-      :src="image"
-      alt="events image"
-      class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
-    />
-  </div>
-        <h2 class="text-3xl md:text-4xl font-bold mb-3 leading-tight">
-          {{ news.status }}
-        </h2>
-        <div class="flex items-center text-sm font-medium opacity-80">
-          <span class="mr-3">Author Name : </span>
-          <span>Time: {{ news.created_at }}</span>
-        </div>
-        
+        <p class="text-lg font-medium opacity-90">{{ news.short_detail }}</p>
+        <div class="mt-3 text-sm opacity-75">By {{ news.reporter?.firstname }} {{ news.reporter?.lastname }}</div>
       </div>
     </div>
-
+ 
     <div
       v-else
-      class="flex p-1 m-auto w-full bg-gray-100 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 mb-5"
+      class="flex flex-row items-start bg-gray-100 rounded-xl shadow-md border border-gray-200 transition-all duration-300 mb-6"
     >
-      <div class="p-6">
+      <div class="w-1/3 p-3">
+        <img
+          :src="news.image?.[0]"
+          alt="news image"
+          class="rounded-lg object-cover w-full h-40 md:h-48 transition-transform duration-300"
+        />
+      </div>
+
+      <div class="w-2/3 p-5">
+        <div class="flex items-center space-x-2 mb-2">
+          <span
+          class="text-xs font-semibold px-2 py-1 rounded uppercase"
+          :class="{
+          'bg-green-600 text-white': displayStatus === 'REAL',
+          'bg-red-600 text-white': displayStatus === 'FAKE',
+          'bg-gray-400 text-white': displayStatus === 'UNKNOWN'
+          }"
+          >
+          {{ displayStatus }}
+          </span>
+          <span class="text-xs text-gray-500">{{ news.created_at }}</span>
+        </div>
+
         <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight">
           {{ news.topic }}
         </h2>
-        <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight">
-          {{ news.status }}
-        </h2>
-        <p class="text-sm text-gray-600 mb-3">
-          {{ news.short_detail }}
-        </p>
+        <p class="text-sm text-gray-600 mb-3">{{ news.short_detail }}</p>
 
-        <div class="flex items-center text-xs font-medium text-gray-600 mb-4">
-          <span class="mr-3">Author Name : </span>
-          <span class="text-emerald-600">Time: {{ news.created_at }}</span>
+        <div class="flex items-center text-xs font-medium text-gray-600">
+          <span class="mr-2">By:</span>
+          <span class="text-emerald-700">{{ news.reporter?.firstname }} {{ news.reporter?.lastname }}</span>
         </div>
-
-        <div class="border-t border-gray-100 pt-4 mt-4">
-          <p class="text-sm text-gray-700 whitespace-pre-line">
-            {{ news.detail }}
-          </p>
-        </div>
-
-        <div class="flex flex-row flew-wrap justify-center">
-    <img
-      v-for="image in news.image"
-      :key="image"
-      :src="image"
-      alt="events image"
-      class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
-    />
-  </div>
       </div>
     </div>
   </router-link>

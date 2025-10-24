@@ -45,6 +45,7 @@ function logout() {
           <div class="flex items-center">
             <SvgIcon type="mdi" :path="mdiAccount" />
             <span class="ml-3">{{ authStore.currentUserName }}</span>
+            <img v-if="authStore.currentUserImage" :src="authStore.currentUserImage" alt="User Avatar" class="ml-2 h-8 w-8 rounded-full" />
           </div>
         </router-link>
       </li>

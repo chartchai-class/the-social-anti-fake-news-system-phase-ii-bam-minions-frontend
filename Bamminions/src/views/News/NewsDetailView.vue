@@ -96,9 +96,10 @@ onMounted(() => {
       <!-- Image -->
       <div class="px-6 md:px-8 mb-6">
         <img
-          class="w-full h-72 md:h-[28rem] object-cover rounded-xl ring-1 ring-gray-200"
-          src="https://media.formula1.com/image/upload/content/dam/fom-website/manual/Misc/2021-Master-Folder/F1%202021%20LAUNCH%20RENDERING%20(2).jpg"
-          alt=""
+        v-if="news.image && news.image.length > 0"
+        :src="news.image[0]"
+        alt="News Image"
+        class="w-full h-auto rounded-lg shadow"
         />
       </div>
 

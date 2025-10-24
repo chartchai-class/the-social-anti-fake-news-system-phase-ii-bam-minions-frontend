@@ -1,11 +1,11 @@
 <script setup lang="ts">
-
 import ImageUpload from '@/components/ImageUpload.vue'
 import * as yup from 'yup'
 import VoteService from '@/services/VoteService'
 import { useField, useForm } from 'vee-validate'
 import type { News, VoteLabel, VoteRequest } from '@/types'
 import { useRouter } from 'vue-router'
+import { useNewsStore } from '@/stores/new'
 
 const props = defineProps<{
   news: News
@@ -16,8 +16,6 @@ const validationSchema = yup.object({
   content: yup.string().required('The conment is required'),
   image: yup.array(yup.string()),
 })
-
-
 
 const router = useRouter()
 const { errors, handleSubmit } = useForm({
@@ -35,6 +33,7 @@ const { value: label } = useField<VoteLabel>('label')
 const { value: comment } = useField<string>('content')
 const { value: image } = useField<string[]>('image')
 
+const newsStore = useNewsStore()
 const submit = handleSubmit((value) => {
   const payload: VoteRequest = {
     label: value.label as VoteLabel,
@@ -42,16 +41,18 @@ const submit = handleSubmit((value) => {
     image: value.image || [],
   }
 
-
   VoteService.savevoteandComment(props.news.id, payload)
     .then(() => {
       console.log('Vote submitted successfully')
+
+      return newsStore.fetchNews(props.news.id)
+    })
+    .then(() => {
       router.push({ name: 'news-detail-view', params: { id: props.news.id } })
     })
     .catch((err) => {
-     console.log('Error submitting vote:', err)
+      console.log('Error submitting vote:', err)
     })
-
 })
 </script>
 
@@ -95,15 +96,13 @@ const submit = handleSubmit((value) => {
       <p v-if="errors.image" class="text-red-600 text-sm mt-1">{{ errors.image }}</p>
     </div>
 
-
-
-   <button
-  class="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
-  :disabled="!label"
-  @click="submit"
-  type="button"
->
-  Submit Vote
-</button>
+    <button
+      class="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
+      :disabled="!label"
+      @click="submit"
+      type="button"
+    >
+      Submit Vote
+    </button>
   </div>
 </template>

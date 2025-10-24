@@ -15,18 +15,19 @@ const apiClient: AxiosInstance = axios.create({
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: null as string | null,
-    user: null as UserReporter | null,
-
+    token: localStorage.getItem('access_token') as string | null,
+    user: (localStorage.getItem('user')
+      ? JSON.parse(localStorage.getItem('user') as string)
+      : null) as UserReporter | null,
   }),
   getters: {
     currentUserName(): string {
-      return this.user?.firstname || '' 
+      return this.user?.firstname || ''
     },
     currentUserImage(): string[]{
       return this.user?.image || ''
     },
-    
+
     authorizationHeader(): string {
       return `Bearer ${this.token}`
     },

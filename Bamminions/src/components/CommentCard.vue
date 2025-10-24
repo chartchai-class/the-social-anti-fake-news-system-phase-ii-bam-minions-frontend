@@ -28,14 +28,14 @@ defineProps<{
       </h6>
 
       <div class="flex flex-row flew-wrap justify-center">
-    <img
-      v-for="image in comment.image"
-      :key="image"
-      :src="image"
-      alt="events image"
-      class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
-    />
-  </div>
+        <img
+          v-for="image in comment.image"
+          :key="image"
+          :src="image"
+          alt="events image"
+          class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
+        />
+      </div>
     </div>
   </div>
 </template>

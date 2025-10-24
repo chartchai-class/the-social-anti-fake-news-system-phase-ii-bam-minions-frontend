@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const authorizeHeader = computed(() => ({
-  Authorization: authStore.authorizationHeader
+  Authorization: authStore.authorizationHeader,
 }))
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 type MediaItem = { name: string }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => []
+  modelValue: () => [],
 })
 
 const convertStringToMedia = (str: string[]): MediaItem[] => {
@@ -28,10 +28,8 @@ const convertMediaToString = (media: MediaItem[]): string[] => {
   return media.map((m) => m.name)
 }
 
-
 const media = ref<MediaItem[]>(convertStringToMedia(props.modelValue))
 const uploadUrl = ref(import.meta.env.VITE_UPLOAD_URL)
-
 
 const onChanged = (files: MediaItem[]) => {
   emit('update:modelValue', convertMediaToString(files))
@@ -39,5 +37,5 @@ const onChanged = (files: MediaItem[]) => {
 </script>
 
 <template>
-  <Uploader :server="uploadUrl" @change="onChanged" :media="media" :headers="authorizeHeader"/>
+  <Uploader :server="uploadUrl" @change="onChanged" :media="media" :headers="authorizeHeader" />
 </template>

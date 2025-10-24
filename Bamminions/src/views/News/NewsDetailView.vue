@@ -56,6 +56,12 @@ onMounted(() => {
           >
             Post on {{ news.created_at }}
           </span>
+
+          <span
+            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
+          >
+            Fake {{ news.fakeCount }} - Not Fake {{ news.notFakeCount }}
+          </span>
         </div>
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
           {{ news.topic }}

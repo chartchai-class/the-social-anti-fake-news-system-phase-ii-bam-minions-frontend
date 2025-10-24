@@ -2,7 +2,7 @@ import apiClient from './AxiosCLient'
 import type { VoteRequest, VoteResponse } from '@/types'
 
 export default {
-  submit(newsId: number, output: VoteRequest) {
+  savevoteandComment(newsId: number, output: VoteRequest) {
     return apiClient.post<VoteResponse>(`/news/${newsId}/vote`, output)
   },
   getCounts(newsId: number) {

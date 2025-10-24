@@ -13,15 +13,7 @@ defineProps<{
     :to="{ name: 'news-detail-view', params: { id: news.id } }"
     class="no-underline w-full"
   >
-    <div class="flex flex-row flew-wrap justify-center">
-      <img
-        v-for="image in news.image"
-        :key="image"
-        :src="image"
-        alt="events image"
-        class="border-solid border-gray-200 border-2 rounded p-1 m-1 w-40 hover:shadow-lg"
-      />
-    </div>
+    
     <div
       v-if="isFeatured"
       class="h-96 relative bg-cover bg-center text-white p-6 flex items-end rounded-xl shadow-2xl transition-shadow duration-300 hover:shadow-3xl"

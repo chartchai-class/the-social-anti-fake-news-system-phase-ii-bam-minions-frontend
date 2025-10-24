@@ -22,6 +22,7 @@ export interface Comment{
     created_at: string;
     usercomment: UserReporter
     voteLabel: VoteLabel
+    image: string[]
 }
 
 export interface NewsState{
@@ -40,6 +41,7 @@ export interface UserReporter {
 export interface VoteRequest {
   label: VoteLabel
   content: string
+  image: string[]
 }
 
 export interface VoteResponse {
@@ -47,4 +49,8 @@ export interface VoteResponse {
   notFakeCount: number
   myVote: VoteLabel | null
   comment: Comment
+}
+
+export interface MessageState {
+  message: string
 }

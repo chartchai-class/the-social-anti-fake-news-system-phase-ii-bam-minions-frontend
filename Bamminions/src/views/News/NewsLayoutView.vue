@@ -15,12 +15,20 @@ const { news } = storeToRefs(store)
         exact-active-class="!border-gray-300 !ring-gray-200"
       >
         <span
-          class="absolute top-1 left-1 h-10 w-14 rounded-full bg-white shadow transition-transform duration-300 group-[.router-link-exact-active]:translate-x-16"
-        ></span>
-        <span
-          class="pointer-events-none absolute inset-0 grid place-items-center font-semibold text-xl md:text-2xl text-gray-800"
+          class="pointer-events-none absolute inset-0 grid place-items-center font-semibold text-2xl md:text-3xl text-gray-800"
         >
           Detail
+        </span>
+      </router-link>
+      <router-link
+        :to="{ name: 'news-vote-view', params: { id: $route.params.id } }"
+        class="group relative w-50 h-25 rounded-2xl border border-gray-300 bg-white/70 backdrop-blur ring-1 ring-black/5 hover:shadow transition"
+        exact-active-class="!border-gray-300 !ring-gray-200"
+      >
+        <span
+          class="pointer-events-none absolute inset-0 grid place-items-center font-semibold text-2xl md:text-3xl text-gray-800"
+        >
+          Vote
         </span>
       </router-link>
     </nav>

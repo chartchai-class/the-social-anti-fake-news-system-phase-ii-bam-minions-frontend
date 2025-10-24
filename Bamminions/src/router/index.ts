@@ -6,6 +6,7 @@ import NewsService from '@/services/NewsService'
 import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'
 import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
+import NewsVoteView from '@/views/News/NewsVoteView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,12 @@ const router = createRouter({
             page: parseInt((route.query.page as string) || '1'),
             pageSize: parseInt((route.query.pageSize as string) || '5'),
           }),
+        },
+        {
+          path: 'vote',
+          name: 'news-vote-view',
+          component: NewsVoteView,
+          props: true,
         },
       ]
   },

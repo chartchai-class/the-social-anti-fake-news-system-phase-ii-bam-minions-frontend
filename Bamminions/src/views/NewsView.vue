@@ -32,11 +32,59 @@ const hasPrev = computed(() => page.value > 1)
 const hasNext = computed(() => page.value < totalPages.value)
 
 const pages = computed(() => {
-  const delta = 2
+  const delta = 10
   const start = Math.max(1, page.value - delta)
   const end = Math.min(totalPages.value, page.value + delta)
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
+
+const deletingId = ref<number | null>(null)
+const deleteErrorId = ref<number | null>(null)
+
+const showConfirm = ref(false)         
+const pendingDeleteId = ref<number | null>(null) 
+const pendingDeleteTitle = ref('')       
+
+const noticeMessage = ref('')
+const noticeType = ref<'success' | 'error'>('success')
+const noticeVisible = ref(false)
+
+function showNotice(msg: string, type: 'success' | 'error') {
+  noticeMessage.value = msg
+  noticeType.value = type
+  noticeVisible.value = true
+
+  setTimeout(() => {
+    noticeVisible.value = false
+  }, 2500)
+}
+
+function askDelete(id: number, title: string) {
+  pendingDeleteId.value = id
+  pendingDeleteTitle.value = title
+  showConfirm.value = true
+}
+
+function cancelDelete() {
+  showConfirm.value = false
+  pendingDeleteId.value = null
+  pendingDeleteTitle.value = ''
+}
+
+function confirmDelete() {
+  if (pendingDeleteId.value === null) {
+    cancelDelete()
+    return
+  }
+
+  const idToDelete = pendingDeleteId.value
+
+  showConfirm.value = false
+  pendingDeleteId.value = null
+  pendingDeleteTitle.value = ''
+
+  return onDeleteNews(idToDelete)
+}
 
 const keyword = ref('')
 function loadEvents() {
@@ -49,8 +97,8 @@ function loadEvents() {
   queryFunction
     .then((response) => {
       const allNews: News[] = response.data
-      specials.value = allNews.find((news: News) => news.id === 1) || null
-      otherNews.value = allNews.filter((news: News) => news.id !== 1)
+      specials.value = allNews.length > 0 ? allNews[0] || null : null
+      otherNews.value = allNews.slice(1)
 
       console.log('Loading normal news:', response.data)
       newsList.value = response.data
@@ -61,6 +109,39 @@ function loadEvents() {
     })
 }
 
+function onDeleteNews(id: number) {
+  deleteErrorId.value = null
+  deletingId.value = id 
+
+  const deletingFeatured =
+    specials.value && specials.value.id === id
+
+  if (deletingFeatured) {
+    if (otherNews.value.length > 0) {
+      const promoted = otherNews.value[0]
+      specials.value = promoted || null
+      otherNews.value = otherNews.value.slice(1)
+    } else {
+      specials.value = null
+      otherNews.value = []
+    }
+  } else {
+    otherNews.value = otherNews.value.filter((n) => n.id !== id)
+  }
+  return NewsService.deleteNews(id)
+    .then(() => {
+      showNotice('News deleted.', 'success')
+      return loadEvents()
+    })
+    .catch(() => {
+      showNotice('Failed to delete news.', 'error') 
+      return loadEvents()
+    })
+    .finally(() => {
+      deletingId.value = null
+    })
+}
+
 onMounted(() => {
   watchEffect(() => {
     loadEvents()
@@ -68,12 +149,54 @@ onMounted(() => {
 })
 </script>
 <template>
+   <div
+    v-if="showConfirm"
+    class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000]
+           w-[90%] max-w-sm
+           bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200
+           p-4 flex flex-col gap-3"
+  >
+    <div class="text-sm font-semibold text-gray-800">
+      Delete this news?
+    </div>
+
+    <div class="text-xs text-gray-600 break-words line-clamp-2">
+      {{ pendingDeleteTitle }}
+    </div>
+
+    <div class="flex justify-end gap-2 text-xs font-medium">
+      <button
+        class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+        @click="cancelDelete"
+      >
+        Cancel
+      </button>
+      <button
+        class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
+        @click="confirmDelete"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <div
+  v-if="noticeVisible"
+  class="fixed top-6 left-1/2 -translate-x-1/2 z-[3000] pointer-events-none"
+>
+  <div
+    class="bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg text-center min-w-[200px]"
+  >
+    {{ noticeMessage }}
+  </div>
+</div>
+
   <div class="flex justify-center gap-4 my-6">
     <router-link
       v-for="size in pageSizeOption"
       :key="size"
       :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
-    >
+      > 
       <button
         class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-500 transition"
         :class="{ 'bg-black text-white font-semibold': pageSize === size }"
@@ -104,11 +227,15 @@ onMounted(() => {
           :news="specials"
           class="w-full max-w-6xl p-0 shadow-2xl overflow-hidden"
           is-featured
+          :on-delete-news="onDeleteNews"
+          :is-deleting="deletingId === specials.id"
+          :on-request-delete="askDelete"
         />
       </div>
 
       <div class="container mx-auto">
-        <NewsCard v-for="newsItem in otherNews" :key="newsItem.id" :news="newsItem" />
+        <NewsCard v-for="newsItem in otherNews" :key="newsItem.id" :news="newsItem" :on-delete-news="onDeleteNews" :is-deleting="deletingId === newsItem.id" :on-request-delete="askDelete"  />
+/>
       </div>
 
       <div class="mt-5 justify-center flex text-sm font-medium text-gray-200">

@@ -16,10 +16,6 @@ const total = ref(0)
 
 const page = computed(() => props.page)
 const pageSize = computed(() => props.pageSize)
-const hasNextPage = computed(() => {
-  const totalPages = Math.ceil(total.value / pageSize.value)
-  return page.value < totalPages
-})
 
 function loadComments() {
   CommentService.getByNews(props.news.id, pageSize.value, page.value)

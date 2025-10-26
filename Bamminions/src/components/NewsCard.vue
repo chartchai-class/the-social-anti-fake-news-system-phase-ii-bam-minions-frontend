@@ -4,7 +4,11 @@ import { computed } from 'vue'
 
 const props = defineProps<{
   news: News
-  isFeatured?: boolean
+  isFeatured?: boolean,
+  onDeleteNews: (id: number) => void | Promise<unknown>
+  isDeleting?: boolean
+  hasError?: boolean
+  onRequestDelete: (id: number, title: string) => void
 }>()
 
 const displayStatus = computed(() => {
@@ -13,16 +17,42 @@ const displayStatus = computed(() => {
   return 'UNKNOWN'
 })
 
+function handleDelete() {
+if (props.isDeleting) return
+  const shortTitle = props.news.topic || 'this news'
+  props.onRequestDelete(props.news.id, shortTitle)
+}
+
 </script>
 
 <template>
+  <div class="relative w-full">
+    <div
+      v-if="hasError"
+      class="absolute top-2 left-3 z-30 bg-red-100 text-red-700 text-[11px] font-medium px-2 py-1 rounded shadow"
+    >
+      Failed to delete. Try again.
+    </div>
+
+    <button
+      @click.stop.prevent="handleDelete"
+      class="absolute top-3 right-3 z-30 text-xs px-3 py-1 rounded shadow
+             transition
+             disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none
+             bg-red-600 text-white hover:bg-red-700"
+      :disabled="isDeleting"
+    >
+      <span v-if="isDeleting">Deleting…</span>
+      <span v-else>X Delete</span>
+    </button>
+
   <router-link
     :to="{ name: 'news-detail-view', params: { id: news.id } }"
     class="no-underline w-full"
   >
       <div
       v-if="isFeatured"
-      class="relative h-[480px] bg-cover bg-center text-black p-6 flex items-end rounded-xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300"
+      class="relative h-[480px] bg-cover bg-center text-white p-6 flex items-end rounded-xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300"
       :style="{ backgroundImage: `url(${news.image?.[0]})` }"
       >
       <div class="absolute inset-0 bg-opacity-50 rounded-xl"></div>
@@ -87,4 +117,5 @@ const displayStatus = computed(() => {
       </div>
     </div>
   </router-link>
+  </div>
 </template>

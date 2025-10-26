@@ -2,12 +2,12 @@
 import NewsCard from '@/components/NewsCard.vue'
 import NewsService from '@/services/NewsService'
 import type { News } from '@/types'
-import { ref, onMounted, computed , watchEffect } from 'vue'
+import { ref, onMounted, computed, watchEffect } from 'vue'
 
 const newsList = ref<News[]>([])
 const pageSizeOption = [2, 3, 4, 6]
-const specials = ref<News | null>(null);
-const otherNews = ref<News[]>([]);
+const specials = ref<News | null>(null)
+const otherNews = ref<News[]>([])
 const totalNews = ref(0)
 
 const props = defineProps({
@@ -40,17 +40,18 @@ const pages = computed(() => {
 
 const keyword = ref('')
 function loadEvents() {
-  let queryFunction;
+  let queryFunction
   if (keyword.value === '') {
     queryFunction = NewsService.getNews(pageSize.value, page.value)
   } else {
-    queryFunction =  NewsService.getNewsByKeyword(keyword.value, pageSize.value, page.value)
+    queryFunction = NewsService.getNewsByKeyword(keyword.value, pageSize.value, page.value)
   }
-  queryFunction.then((response) => {
-      const allNews: News[] = response.data;
-      specials.value = allNews.find((news: News) => news.id === 1) || null;
-      otherNews.value = allNews.filter((news: News) => news.id !== 1);
-      
+  queryFunction
+    .then((response) => {
+      const allNews: News[] = response.data
+      specials.value = allNews.find((news: News) => news.id === 1) || null
+      otherNews.value = allNews.filter((news: News) => news.id !== 1)
+
       console.log('Loading normal news:', response.data)
       newsList.value = response.data
       totalNews.value = response.headers['x-total-count']
@@ -68,96 +69,94 @@ onMounted(() => {
 </script>
 <template>
   <div class="flex justify-center gap-4 my-6">
-        <router-link
-          v-for="size in pageSizeOption"
-          :key="size"
-          :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
-        >
-          <button
-            class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-500 transition"
-            :class="{ 'bg-black text-white font-semibold': pageSize === size }"
-          >
-            {{ size }} per page
-          </button>
-        </router-link>
-    </div>
-
-    <div class = "w-64 justify-center mx-auto mb-6">
-    <BaseInput
-      v-model="keyword"
-      label="Search..."
-      @input="loadEvents"
-      class="w-full"/>
-    </div>
-
-    <div class="pt-8 pb-16 min-h-screen bg-gradient-to-b from-gray-700">
-        <div class="container mx-auto px-4 md:px-50">
-            
-            <div class="flex justify-center mb-10">
-                <NewsCard 
-                    v-if="specials" 
-                    :news="specials" 
-                    class="w-full max-w-6xl p-0 shadow-2xl overflow-hidden" 
-                    is-featured 
-                />
-            </div>
-            
-            <div class="container mx-auto">
-                <NewsCard v-for="newsItem in otherNews" :key="newsItem.id" :news="newsItem" />
-            </div>
-            
-            <div class="mt-5 justify-center flex text-sm font-medium text-gray-200">
-              Page {{ page }} of {{ totalPages }}
-                <span v-if="totalNews">
-                </span>
-            </div>
-            
-  <div class="flex justify-center items-center mt-8 space-x-2 select-none">
-    
     <router-link
-      v-if="hasPrev"
-      :to="{ name: 'news-view', query: { page: page - 1, pageSize: pageSize } }"
-      class="flex items-center"
+      v-for="size in pageSizeOption"
+      :key="size"
+      :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
     >
       <button
-        class="min-w-[90px] h-9 flex items-center justify-center rounded border text-white hover:bg-gray-200 transition"
+        class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-500 transition"
+        :class="{ 'bg-black text-white font-semibold': pageSize === size }"
       >
-        ‹ Prev Page
-      </button>
-    </router-link>
-
-    <div class="flex space-x-2 mx-2">
-      <router-link
-        v-for="num in pages"
-        :key="num"
-        :to="{ name: 'news-view', query: { page: num, pageSize: pageSize } }"
-      >
-        <button
-          class="w-9 h-9 flex items-center justify-center border transition"
-          :class="[
-
-            num === page
-            ? ' text-black bg-white font-bold'
-            : ' text-gray-700 bg-gray-100 hover:bg-gray-400'
-          ]"
-        >
-          {{ num }}
-        </button>
-      </router-link>
-    </div>
-
-    <router-link
-      v-if="hasNext"
-      :to="{ name: 'news-view', query: { page: page + 1, pageSize: pageSize } }"
-      class="flex items-center"
-    >
-      <button
-        class="min-w-[90px] h-9 flex items-center justify-center border rounded text-white hover:bg-black transition"
-      >
-        Next Page ›
+        {{ size }} per page
       </button>
     </router-link>
   </div>
+
+  <div class="container mx-auto px-4 md:px-50 mt-6 flex justify-end">
+    <router-link :to="{ name: 'add-news' }">
+      <button class="button -fill-gradient px-4 py-2 rounded-lg">+ Add News</button>
+    </router-link>
+  </div>
+
+  <div class="w-64 justify-center mx-auto mb-6">
+    <BaseInput v-model="keyword" label="Search..." @input="loadEvents" class="w-full" />
+  </div>
+
+  <div class="pt-8 pb-16 min-h-screen bg-gradient-to-b from-gray-700">
+    <div class="container mx-auto px-4 md:px-50">
+      <div class="flex justify-center mb-10">
+        <NewsCard
+          v-if="specials"
+          :news="specials"
+          class="w-full max-w-6xl p-0 shadow-2xl overflow-hidden"
+          is-featured
+        />
+      </div>
+
+      <div class="container mx-auto">
+        <NewsCard v-for="newsItem in otherNews" :key="newsItem.id" :news="newsItem" />
+      </div>
+
+      <div class="mt-5 justify-center flex text-sm font-medium text-gray-200">
+        Page {{ page }} of {{ totalPages }}
+        <span v-if="totalNews"> </span>
+      </div>
+
+      <div class="flex justify-center items-center mt-8 space-x-2 select-none">
+        <router-link
+          v-if="hasPrev"
+          :to="{ name: 'news-view', query: { page: page - 1, pageSize: pageSize } }"
+          class="flex items-center"
+        >
+          <button
+            class="min-w-[90px] h-9 flex items-center justify-center rounded border text-white hover:bg-gray-200 transition"
+          >
+            ‹ Prev Page
+          </button>
+        </router-link>
+
+        <div class="flex space-x-2 mx-2">
+          <router-link
+            v-for="num in pages"
+            :key="num"
+            :to="{ name: 'news-view', query: { page: num, pageSize: pageSize } }"
+          >
+            <button
+              class="w-9 h-9 flex items-center justify-center border transition"
+              :class="[
+                num === page
+                  ? ' text-black bg-white font-bold'
+                  : ' text-gray-700 bg-gray-100 hover:bg-gray-400',
+              ]"
+            >
+              {{ num }}
+            </button>
+          </router-link>
         </div>
+
+        <router-link
+          v-if="hasNext"
+          :to="{ name: 'news-view', query: { page: page + 1, pageSize: pageSize } }"
+          class="flex items-center"
+        >
+          <button
+            class="min-w-[90px] h-9 flex items-center justify-center border rounded text-white hover:bg-black transition"
+          >
+            Next Page ›
+          </button>
+        </router-link>
+      </div>
     </div>
+  </div>
 </template>

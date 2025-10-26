@@ -7,6 +7,7 @@ import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'
 import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
 import NewsVoteView from '@/views/News/NewsVoteView.vue'
+import NewFromView from '@/views/form/NewFromView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -67,6 +68,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegisterView,
+    },
+    {
+      path: '/add-news',
+      name: 'add-news',
+      component: NewFromView,
     },
   ],
 })

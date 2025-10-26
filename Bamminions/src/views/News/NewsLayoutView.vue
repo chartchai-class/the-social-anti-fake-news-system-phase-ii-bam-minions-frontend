@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useNewsStore } from '@/stores/new'
-import { on } from 'events'
 import { storeToRefs } from 'pinia'
-import { onMounted, watchEffect } from 'vue'
 
 const store = useNewsStore()
 const { news } = storeToRefs(store)

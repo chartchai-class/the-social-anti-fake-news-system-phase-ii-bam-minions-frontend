@@ -235,7 +235,6 @@ onMounted(() => {
 
       <div class="container mx-auto">
         <NewsCard v-for="newsItem in otherNews" :key="newsItem.id" :news="newsItem" :on-delete-news="onDeleteNews" :is-deleting="deletingId === newsItem.id" :on-request-delete="askDelete"  />
-/>
       </div>
 
       <div class="mt-5 justify-center flex text-sm font-medium text-gray-200">

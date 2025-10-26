@@ -33,9 +33,8 @@ function loadComments() {
 }
 
 onMounted(() => {
-  watchEffect(() => {
-    loadComments()
-  })
+  loadComments()
+  loadComments()
 })
 </script>
 

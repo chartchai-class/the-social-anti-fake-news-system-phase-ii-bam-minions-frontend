@@ -49,12 +49,12 @@ function saveNews() {
 
 <template>
   <!-- Full screen center -->
-  <div class="min-h-screen w-full flex items-center justify-center p-4">
+  <div class="w-full flex items-center justify-center p-4 min-h-screen bg-gradient-to-b to-white">
     <!-- Transparent card -->
     <div
       class="w-full max-w-2xl rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-xl p-6"
     >
-      <h1 class="text-4xl font-bold mb-4 text-center">Create your news</h1>
+      <h1 class="text-5xl font-bold mb-4 text-center">Create your News</h1>
 
       <form @submit.prevent="saveNews" class="space-y-4">
         <div class="space-y-1">
@@ -86,26 +86,18 @@ function saveNews() {
           <textarea
             id="detail"
             v-model="news.detail"
-            rows="6"
-            class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
+            class="w-full h-28 resize-none overflow-y-auto no-scrollbar border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40 h-48 overflow-y-auto resize-y [scrollbar-width:none] [-ms-overflow-style:'none'] [&::-webkit-scrollbar]:hidden"
             placeholder="Write the full news content"
             required
-          />
+          ></textarea>
         </div>
 
         <div class="space-y-2">
           <label class="block font-medium">Images</label>
           <ImageUpload v-model="news.image" />
         </div>
-        <div class="flex flex-col sm:flex-row justify-center gap-3 mt-6">
-          <!-- Cancel → go back to news list -->
-          <router-link
-            :to="{ name: 'news-view' }"
-            class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold border border-white/30 bg-white/0 text-white text-center hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition"
-          >
-            Cancel
-          </router-link>
 
+        <div class="flex flex-col sm:flex-row justify-center gap-3 mt-6">
           <!-- Submit -->
           <button
             class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-indigo-600 transition"
@@ -113,6 +105,13 @@ function saveNews() {
           >
             Submit
           </button>
+
+          <router-link
+            :to="{ name: 'news-view' }"
+            class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-red-600 text-white text-center shadow-lg hover:bg-red-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 active:scale-[0.99] transition"
+          >
+            Cancel
+          </router-link>
         </div>
       </form>
     </div>

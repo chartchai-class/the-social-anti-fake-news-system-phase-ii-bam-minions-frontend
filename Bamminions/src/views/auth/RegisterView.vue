@@ -40,7 +40,7 @@ const onSubmit = handleSubmit((values) => {
     .register(values.firstname, values.lastname, values.email, values.password , values.image)
     .then(() => {
       console.log('Registration successful')
-      router.push({ name: 'login' })
+      router.push({ name: 'news-view' })
     })
     .catch((err) => {
       messageStore.updateMessage('could not register')

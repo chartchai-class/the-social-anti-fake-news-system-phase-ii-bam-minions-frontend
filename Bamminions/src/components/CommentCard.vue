@@ -4,6 +4,7 @@ import { type Comment } from '@/types'
 defineProps<{
   comment: Comment
 }>()
+
 </script>
 
 <template>
@@ -29,7 +30,7 @@ defineProps<{
           : 'bg-red-50 text-red-700 ring-red-200'
       "
     >
-      {{ comment.voteLabel === 'NOT_FAKE' ? 'Truth' : 'Fake' }}
+      {{ comment.voteLabel === 'NOT_FAKE' ? 'REAL' : 'FAKE' }}
     </span>
 
     <!-- content -->

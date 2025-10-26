@@ -83,11 +83,14 @@ onMounted(() => {
     </router-link>
   </div>
 
-  <div class="container mx-auto px-4 md:px-50 mt-6 flex justify-end">
-    <router-link :to="{ name: 'add-news' }">
-      <button class="button -fill-gradient px-4 py-2 rounded-lg">+ Add News</button>
-    </router-link>
-  </div>
+  <router-link
+    :to="{ name: 'add-news' }"
+    aria-label="Add News"
+    class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full px-4 py-3 font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
+  >
+    <span class="text-xl leading-none">＋</span>
+    <span class="hidden sm:inline">Add News</span>
+  </router-link>
 
   <div class="w-64 justify-center mx-auto mb-6">
     <BaseInput v-model="keyword" label="Search..." @input="loadEvents" class="w-full" />

@@ -1,89 +1,120 @@
 <script setup lang="ts">
-import { Form, Field, ErrorMessage, type SubmissionHandler } from 'vee-validate'
-import * as yup from 'yup'
-import ImageUpload from '@/components/ImageUpload.vue'
-import apiClient from '@/services/AxiosCLient'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useMessageStore } from '@/stores/message'
+import ImageUpload from '@/components/ImageUpload.vue'
+import NewsService from '@/services/NewsService'
+import type { News as NewsType } from '@/types'
 
-const router = useRouter()
-
-// 1) Define the form value type
-type NewsForm = {
+// Only the fields users should input
+const news = ref<{
   topic: string
   short_detail: string
   detail: string
   image: string[]
-}
-
-// 2) Initial values (lets <Form> infer generics instead of GenericObject)
-const initialValues: NewsForm = {
+}>({
   topic: '',
   short_detail: '',
   detail: '',
   image: [],
-}
-
-const schema = yup.object({
-  topic: yup.string().required().min(5).max(120),
-  short_detail: yup.string().required().max(200),
-  detail: yup.string().required().min(20),
-  image: yup.array().of(yup.string()).max(1, 'Only 1 image allowed'),
 })
 
-// 3) Type the submit handler the same way
-const submit: SubmissionHandler<NewsForm> = (vals) => {
-  return apiClient
-    .post('/news', vals)
-    .then(({ data }) => router.push({ name: 'news-detail-view', params: { id: data.id } }))
-    .catch((e) => {
-      console.error(e)
-      alert('Failed to create news.')
+const router = useRouter()
+const store = useMessageStore()
+
+function saveNews() {
+  // Send only user-entered fields; backend will fill id/created_at/reporter/status/counts/comments
+  NewsService.saveNews({
+    topic: news.value.topic,
+    short_detail: news.value.short_detail,
+    detail: news.value.detail,
+    image: news.value.image,
+  } as unknown as NewsType)
+    .then((response) => {
+      router.push({ name: 'news-detail-view', params: { id: response.data.id } })
+      store.updateMessage('You successfully created news: ' + response.data.topic)
+      setTimeout(() => {
+        store.resetMessage()
+      }, 3000)
+    })
+    .catch(() => {
+      router.push({ name: 'news-view' })
+      store.updateMessage('Failed to create news: ' + news.value.topic)
+      setTimeout(() => {
+        store.resetMessage()
+      }, 3000)
     })
 }
 </script>
 
 <template>
-  <!-- 4) Pass :initial-values so the generic is NewsForm (not GenericObject) -->
-  <Form
-    :validation-schema="schema"
-    :initial-values="initialValues"
-    @submit="submit"
-    v-slot="{ errors, isSubmitting, setFieldValue }"
-  >
-    <div class="max-w-2xl mx-auto p-4 space-y-4">
-      <div>
-        <label class="block text-sm font-medium mb-1">Topic</label>
-        <Field name="topic" as="input" type="text" class="w-full border rounded p-2" />
-        <ErrorMessage name="topic" class="text-sm text-red-600" />
-      </div>
+  <!-- Full screen center -->
+  <div class="min-h-screen w-full flex items-center justify-center p-4">
+    <!-- Transparent card -->
+    <div
+      class="w-full max-w-2xl rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-xl p-6"
+    >
+      <h1 class="text-4xl font-bold mb-4 text-center">Create your news</h1>
 
-      <Field name="short_detail" as="textarea" rows="3" class="w-full border rounded p-2" />
-      <Field name="detail" as="textarea" rows="8" class="w-full border rounded p-2" />
-
-      <div>
-        <div class="flex items-center justify-between mb-1">
-          <label class="block text-sm font-medium">Image (1 max)</label>
-          <span class="text-xs text-gray-500">Optional</span>
+      <form @submit.prevent="saveNews" class="space-y-4">
+        <div class="space-y-1">
+          <label for="topic" class="block font-medium">Topic</label>
+          <input
+            id="topic"
+            v-model="news.topic"
+            type="text"
+            class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
+            placeholder="Headline"
+            required
+          />
         </div>
-        <ImageUpload
-          :limit="1"
-          @update:modelValue="(arr) => setFieldValue('image', (arr || []).slice(0, 1))"
-        />
-        <ErrorMessage name="image" class="text-sm text-red-600" />
-      </div>
 
-      <div class="pt-2 flex gap-3">
-        <button
-          type="submit"
-          :disabled="isSubmitting"
-          class="rounded bg-indigo-600 text-white px-4 py-2 disabled:opacity-60"
-        >
-          {{ isSubmitting ? 'Creating…' : 'Create' }}
-        </button>
-        <router-link :to="{ name: 'news-view' }" class="rounded border px-4 py-2"
-          >Cancel</router-link
-        >
-      </div>
+        <div class="space-y-1">
+          <label for="short_detail" class="block font-medium">Short detail</label>
+          <input
+            id="short_detail"
+            v-model="news.short_detail"
+            type="text"
+            class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
+            placeholder="One-line summary"
+            required
+          />
+        </div>
+
+        <div class="space-y-1">
+          <label for="detail" class="block font-medium">Detail</label>
+          <textarea
+            id="detail"
+            v-model="news.detail"
+            rows="6"
+            class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
+            placeholder="Write the full news content"
+            required
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block font-medium">Images</label>
+          <ImageUpload v-model="news.image" />
+        </div>
+        <div class="flex flex-col sm:flex-row justify-center gap-3 mt-6">
+          <!-- Cancel → go back to news list -->
+          <router-link
+            :to="{ name: 'news-view' }"
+            class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold border border-white/30 bg-white/0 text-white text-center hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition"
+          >
+            Cancel
+          </router-link>
+
+          <!-- Submit -->
+          <button
+            class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-indigo-600 transition"
+            type="submit"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
     </div>
-  </Form>
+  </div>
 </template>

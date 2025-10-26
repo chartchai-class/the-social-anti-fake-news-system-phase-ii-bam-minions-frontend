@@ -36,19 +36,21 @@ function choose(value: VoteLabel) {
 }
 
 const newsStore = useNewsStore()
-const submit = handleSubmit(async (value) => {
+const submit = handleSubmit((value) => {
   const payload: VoteRequest = {
     label: value.label as VoteLabel,
     content: value.content || '',
     image: value.image || [],
   }
-  try {
-    await VoteService.savevoteandComment(props.news.id, payload)
-    await newsStore.fetchNews(props.news.id)
-    router.push({ name: 'news-detail-view', params: { id: props.news.id } })
-  } catch (err) {
-    console.log('Error submitting vote:', err)
-  }
+
+  VoteService.savevoteandComment(props.news.id, payload)
+    .then(() => newsStore.fetchNews(props.news.id))
+    .then(() => {
+      router.push({ name: 'news-detail-view', params: { id: props.news.id } })
+    })
+    .catch((err) => {
+      console.log('Error submitting vote:', err)
+    })
 })
 
 onMounted(() => {
@@ -58,7 +60,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="p-4 sm:p-5 rounded-2xl bg-white/70 dark:bg-zinc-900/60 backdrop-blur ring-1 ring-black/5 dark:ring-white/10 shadow-md space-y-4 max-w-xl center mx-auto"
+    class="p-4 sm:p-5 rounded-2xl backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden dark:ring-white/10 shadow-md space-y-4 max-w-xl center mx-auto"
   >
     <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white text-center">
       Vote on this News
@@ -136,7 +138,7 @@ onMounted(() => {
         {{ errors.image }}
       </p>
     </div>
-    <div class="flex justify-center">
+    <div class="flex justify-center gap-3 mt-6">
       <button
         type="button"
         class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-indigo-600 transition"
@@ -145,6 +147,13 @@ onMounted(() => {
       >
         Submit Vote
       </button>
+
+      <router-link
+        :to="{ name: 'news-detail-view', params: { id: props.news.id } }"
+        class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-red-600 text-white text-center shadow-lg hover:bg-red-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 active:scale-[0.99] transition"
+      >
+        Cancel
+      </router-link>
     </div>
   </div>
 </template>

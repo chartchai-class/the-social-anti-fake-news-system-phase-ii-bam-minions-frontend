@@ -18,10 +18,10 @@ const router = createRouter({
       component: NewsView,
       props: (route) => {
         const page = parseInt((route.query.page as string) || '1')
-        const pageSize = parseInt((route.query.pageSize as string) || '2')
+        const pageSize = parseInt((route.query.pageSize as string) || '6')
         return {
           page: isNaN(page) ? 1 : page,
-          pageSize: isNaN(pageSize) ? 2 : pageSize,
+          pageSize: isNaN(pageSize) ? 6 : pageSize,
         }
       },
     },

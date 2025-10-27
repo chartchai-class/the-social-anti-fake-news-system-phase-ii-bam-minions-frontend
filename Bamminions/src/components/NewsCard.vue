@@ -29,6 +29,7 @@ if (props.isDeleting) return
     </div>
 
     <button
+      v-if="auth.isAdmin"
       @click.stop.prevent="handleDelete"
       class="absolute top-3 right-3 z-30 text-xs px-3 py-1 rounded shadow
              transition

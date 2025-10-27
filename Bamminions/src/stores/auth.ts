@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
-import type { UserReporter } from '@/types'
+import type { AdminUser , UserReporter } from '@/types'
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -18,22 +18,32 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('access_token') as string | null,
     user: (localStorage.getItem('user')
       ? JSON.parse(localStorage.getItem('user') as string)
-      : null) as UserReporter | null,
+      : null) as AdminUser | null,
   }),
   getters: {
     currentUserName(): string {
       return this.user?.firstname || ''
     },
     currentUserImage(): string[]{
-      return this.user?.image || ''
+      return this.user?.image || []
     },
 
     authorizationHeader(): string {
       return `Bearer ${this.token}`
     },
-    // isAdmin(): boolean {
-    //   return this.user?.roles.includes('ROLE_ADMIN') || false
-    // },
+
+      isAdmin(): boolean {
+       
+      const roles = Array.isArray(this.user?.roles) ? (this.user!.roles as string[]) : []
+       console.log('Checking isAdmin for user:', this.user?.roles)
+      return roles.includes('ROLE_ADMIN')
+    },
+    isMember(): boolean {
+      const roles = Array.isArray(this.user?.roles) ? (this.user!.roles as string[]) : []
+       console.log('Checking isMember for user:', this.user?.roles)
+      return roles.includes('ROLE_MEMBER')
+    },
+
   },
   actions: {
     login(email: string, password: string) {

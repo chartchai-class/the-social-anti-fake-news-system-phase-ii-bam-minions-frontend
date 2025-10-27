@@ -210,6 +210,7 @@ onMounted(() => {
   </div>
 
   <router-link
+  v-if="auth.isMember || auth.isAdmin"
     :to="{ name: 'add-news' }"
     aria-label="Add News"
     class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full px-4 py-3 font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"

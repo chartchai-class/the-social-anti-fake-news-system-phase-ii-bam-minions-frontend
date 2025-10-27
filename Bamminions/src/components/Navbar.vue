@@ -41,7 +41,7 @@ function logout() {
     </ul>
     <ul v-if="authStore.currentUserName" class="flex navbar-nav ml-auto">
       <li class="nav-item px-2">
-        <router-link to="/profile" class="nav-link">
+        <router-link :to="{ name: 'admin-dashboard' }" class="nav-link">
           <div class="flex items-center">
             <SvgIcon type="mdi" :path="mdiAccount" />
             <span class="ml-3">{{ authStore.currentUserName }}</span>

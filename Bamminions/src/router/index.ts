@@ -8,6 +8,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
 import NewsVoteView from '@/views/News/NewsVoteView.vue'
 import NewFromView from '@/views/form/NewFromView.vue'
+import AdminDashboard from '@/views/AdminDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,6 +74,19 @@ const router = createRouter({
       path: '/add-news',
       name: 'add-news',
       component: NewFromView,
+    },
+    {
+      path: '/admin',
+      name: 'admin-dashboard',
+      component: AdminDashboard,
+      props: (route) => {
+        const page = parseInt((route.query.page as string) || '1')
+        const pageSize = parseInt((route.query.pageSize as string) || '6')
+        return {
+          page: isNaN(page) ? 1 : page,
+          pageSize: isNaN(pageSize) ? 10 : pageSize,
+        }
+      },
     },
   ],
 })

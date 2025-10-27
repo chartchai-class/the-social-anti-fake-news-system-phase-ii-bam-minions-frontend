@@ -3,6 +3,8 @@ import NewsCard from '@/components/NewsCard.vue'
 import NewsService from '@/services/NewsService'
 import type { News } from '@/types'
 import { ref, onMounted, computed, watchEffect } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+const auth = useAuthStore()
 
 const newsList = ref<News[]>([])
 const pageSizeOption = [2, 3, 4, 6]
@@ -207,6 +209,7 @@ onMounted(() => {
   </div>
 
   <router-link
+  v-if="auth.isMember || auth.isAdmin"
     :to="{ name: 'add-news' }"
     aria-label="Add News"
     class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full px-4 py-3 font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"

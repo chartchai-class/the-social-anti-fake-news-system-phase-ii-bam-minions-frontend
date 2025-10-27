@@ -54,3 +54,16 @@ export interface VoteResponse {
 export interface MessageState {
   message: string
 }
+
+export type Role = 'ROLE_READER' | 'ROLE_ADMIN' | 'ROLE_MEMBER' | string
+
+export type AdminUser = {
+  id: number
+  firstname: string
+  lastname: string
+  username: string
+  email: string
+  roles: Role[]
+  enabled: boolean
+  created_at: string
+}

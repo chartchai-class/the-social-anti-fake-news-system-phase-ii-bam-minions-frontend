@@ -32,16 +32,11 @@ export const useAuthStore = defineStore('auth', {
       return `Bearer ${this.token}`
     },
 
-      isAdmin(): boolean {
-       
-      const roles = Array.isArray(this.user?.roles) ? (this.user!.roles as string[]) : []
-       console.log('Checking isAdmin for user:', this.user?.roles)
-      return roles.includes('ROLE_ADMIN')
+      isAdmin(): boolean { 
+     return this.user?.roles.includes('ROLE_ADMIN') || false
     },
     isMember(): boolean {
-      const roles = Array.isArray(this.user?.roles) ? (this.user!.roles as string[]) : []
-       console.log('Checking isMember for user:', this.user?.roles)
-      return roles.includes('ROLE_MEMBER')
+      return this.user?.roles.includes('ROLE_MEMBER') || false
     },
 
   },

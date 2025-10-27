@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type News } from '@/types'
-
+import { useAuthStore } from '@/stores/auth'
+const auth = useAuthStore()
 const props = defineProps<{
   news: News
   isFeatured?: boolean,

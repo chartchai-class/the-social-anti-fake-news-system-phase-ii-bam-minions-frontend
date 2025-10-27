@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type Comment } from '@/types'
-
+import { useAuthStore } from '@/stores/auth'
+const auth = useAuthStore()
 
 const props = defineProps<{
   comment: Comment
@@ -45,6 +46,7 @@ function handleDeleteComment() {
     </span>
 
      <button
+      v-if="auth.isAdmin === true"
       class="text-[10px] font-semibold text-red-200 bg-red-600 rounded px-2 py-[2px] hover:bg-red-50 hover:text-red-700 absolute bottom-2 right-3
              disabled:opacity-50 disabled:cursor-not-allowed"
       :disabled="isDeleting"

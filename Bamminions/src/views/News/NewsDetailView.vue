@@ -10,6 +10,8 @@ const props = defineProps<{
   pageSize: number
 }>()
 
+import { useAuthStore } from '@/stores/auth'
+const auth = useAuthStore()
 const comments = ref<Comment[]>([])
 
 const totalComments = ref(0)
@@ -206,17 +208,20 @@ onMounted(() => {
 
       <div class="flex justify-end gap-2 text-xs font-medium">
         <button
+        
           class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
           @click="cancelDeleteComment"
         >
           Cancel
         </button>
-        <button
+        <button 
           class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
           @click="confirmDeleteComment"
+         
         >
           Delete
         </button>
+       
       </div>
     </div>
 

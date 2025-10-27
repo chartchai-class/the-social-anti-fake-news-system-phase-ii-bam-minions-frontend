@@ -2,7 +2,9 @@
 import NewsCard from '@/components/NewsCard.vue'
 import NewsService from '@/services/NewsService'
 import type { News } from '@/types'
-import { ref, onMounted, computed, watchEffect, watch } from 'vue'
+import { ref, onMounted, computed, watchEffect } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+const auth = useAuthStore()
 
 const newsList = ref<News[]>([])
 const pageSizeOption = [2, 3, 4, 6]

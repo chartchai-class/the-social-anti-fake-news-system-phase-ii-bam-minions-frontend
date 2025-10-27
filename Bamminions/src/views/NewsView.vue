@@ -2,7 +2,7 @@
 import NewsCard from '@/components/NewsCard.vue'
 import NewsService from '@/services/NewsService'
 import type { News } from '@/types'
-import { ref, onMounted, computed, watchEffect } from 'vue'
+import { ref, onMounted, computed, watchEffect, watch } from 'vue'
 
 const newsList = ref<News[]>([])
 const pageSizeOption = [2, 3, 4, 6]
@@ -40,9 +40,9 @@ const pages = computed(() => {
 const deletingId = ref<number | null>(null)
 const deleteErrorId = ref<number | null>(null)
 
-const showConfirm = ref(false)         
-const pendingDeleteId = ref<number | null>(null) 
-const pendingDeleteTitle = ref('')       
+const showConfirm = ref(false)
+const pendingDeleteId = ref<number | null>(null)
+const pendingDeleteTitle = ref('')
 
 const noticeMessage = ref('')
 const noticeType = ref<'success' | 'error'>('success')
@@ -110,10 +110,9 @@ function loadEvents() {
 
 function onDeleteNews(id: number) {
   deleteErrorId.value = null
-  deletingId.value = id 
+  deletingId.value = id
 
-  const deletingFeatured =
-    specials.value && specials.value.id === id
+  const deletingFeatured = specials.value && specials.value.id === id
 
   if (deletingFeatured) {
     if (otherNews.value.length > 0) {
@@ -133,7 +132,7 @@ function onDeleteNews(id: number) {
       return loadEvents()
     })
     .catch(() => {
-      showNotice('Failed to delete news.', 'error') 
+      showNotice('Failed to delete news.', 'error')
       return loadEvents()
     })
     .finally(() => {
@@ -148,16 +147,11 @@ onMounted(() => {
 })
 </script>
 <template>
-   <div
+  <div
     v-if="showConfirm"
-    class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000]
-           w-[90%] max-w-sm
-           bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200
-           p-4 flex flex-col gap-3"
+    class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
   >
-    <div class="text-sm font-semibold text-gray-800">
-      Delete this news?
-    </div>
+    <div class="text-sm font-semibold text-gray-800">Delete this news?</div>
 
     <div class="text-xs text-gray-600 break-words line-clamp-2">
       {{ pendingDeleteTitle }}
@@ -180,22 +174,22 @@ onMounted(() => {
   </div>
 
   <div
-  v-if="noticeVisible"
-  class="fixed top-6 left-1/2 -translate-x-1/2 z-[3000] pointer-events-none"
->
-  <div
-    class="bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg text-center min-w-[200px]"
+    v-if="noticeVisible"
+    class="fixed top-6 left-1/2 -translate-x-1/2 z-[3000] pointer-events-none"
   >
-    {{ noticeMessage }}
+    <div
+      class="bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg text-center min-w-[200px]"
+    >
+      {{ noticeMessage }}
+    </div>
   </div>
-</div>
 
   <div class="flex justify-center gap-4 my-6">
     <router-link
       v-for="size in pageSizeOption"
       :key="size"
       :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
-      > 
+    >
       <button
         class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-500 transition"
         :class="{ 'bg-black text-white font-semibold': pageSize === size }"
@@ -203,6 +197,16 @@ onMounted(() => {
         {{ size }} per page
       </button>
     </router-link>
+  </div>
+
+  <div>
+    <input
+      v-model="keyword"
+      type="text"
+      placeholder="Search..."
+      @input="loadEvents"
+      class="border rounded px-2 py-1 w-64 mx-auto block mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+    />
   </div>
 
   <router-link
@@ -233,7 +237,14 @@ onMounted(() => {
       </div>
 
       <div class="container mx-auto">
-        <NewsCard v-for="newsItem in otherNews" :key="newsItem.id" :news="newsItem" :on-delete-news="onDeleteNews" :is-deleting="deletingId === newsItem.id" :on-request-delete="askDelete"  />
+        <NewsCard
+          v-for="newsItem in otherNews"
+          :key="newsItem.id"
+          :news="newsItem"
+          :on-delete-news="onDeleteNews"
+          :is-deleting="deletingId === newsItem.id"
+          :on-request-delete="askDelete"
+        />
       </div>
 
       <div class="mt-5 justify-center flex text-sm font-medium text-gray-200">

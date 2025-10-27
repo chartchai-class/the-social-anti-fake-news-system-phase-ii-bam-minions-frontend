@@ -32,9 +32,8 @@ const hasPrev = computed(() => page.value > 1)
 const hasNext = computed(() => page.value < totalPages.value)
 
 const pages = computed(() => {
-  const delta = 10
-  const start = Math.max(1, page.value - delta)
-  const end = Math.min(totalPages.value, page.value + delta)
+  const start = 1
+  const end = totalPages.value
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
 

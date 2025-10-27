@@ -1,7 +1,7 @@
 export interface News{
     id: number;
     topic: string;
-    short_detail: string;
+    shortDetail: string;
     detail: string;
     created_at: string;
     reporter: UserReporter;

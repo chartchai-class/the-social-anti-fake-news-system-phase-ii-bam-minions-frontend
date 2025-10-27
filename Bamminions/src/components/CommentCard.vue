@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { type Comment } from '@/types'
 
-defineProps<{
+
+const props = defineProps<{
   comment: Comment
+  isDeleting?: boolean
+  hasError?: boolean
+  onRequestDelete: (id: number, contentPreview: string) => void
 }>()
+
+
+function handleDeleteComment() {
+  if (props.isDeleting) return
+  const preview = props.comment.content.slice(0, 20) || 'this comment'
+  props.onRequestDelete(props.comment.id, preview)
+}
 
 </script>
 
@@ -30,8 +41,18 @@ defineProps<{
           : 'bg-red-50 text-red-700 ring-red-200'
       "
     >
-      {{ comment.voteLabel === 'NOT_FAKE' ? 'REAL' : 'FAKE' }}
+      {{ comment.voteLabel === 'NOT_FAKE' ? 'NOT FAKE' : 'FAKE' }}
     </span>
+
+     <button
+      class="text-[10px] font-semibold text-red-200 bg-red-600 rounded px-2 py-[2px] hover:bg-red-50 hover:text-red-700 absolute bottom-2 right-3
+             disabled:opacity-50 disabled:cursor-not-allowed"
+      :disabled="isDeleting"
+      @click.stop.prevent="handleDeleteComment"
+    >
+      <span v-if="isDeleting">Deleting…</span>
+      <span v-else>Delete</span>
+    </button>
 
     <!-- content -->
     <p class="text-sm text-gray-900 leading-6 break-words">

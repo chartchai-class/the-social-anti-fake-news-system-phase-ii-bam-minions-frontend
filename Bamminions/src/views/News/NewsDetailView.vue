@@ -46,27 +46,139 @@ function loadComments() {
 
 watch(
   () => [props.page, props.pageSize],
-  ([newPage, newPageSize]) => {
-    const normalizedPage = newPage && newPage > 0 ? newPage : 1
-    const normalizedSize = newPageSize && newPageSize > 0 ? newPageSize : 5
+  ([newPage, newSize]) => {
+    const pageNorm = newPage && newPage > 0 ? newPage : 1
+    const sizeNorm = newSize && newSize > 0 ? newSize : 5
 
-    const sizeChanged = normalizedSize !== currentPageSize.value
-    const pageChanged = normalizedPage !== currentPage.value
+    const sizeChanged = sizeNorm !== currentPageSize.value
+    const pageChanged = pageNorm !== currentPage.value
 
-    if (!sizeChanged && !pageChanged) {
-      return
-    }
+    if (!sizeChanged && !pageChanged) return
 
     if (sizeChanged) {
-      // ถ้า pageSize เปลี่ยน -> กลับไปหน้าแรก
-      currentPageSize.value = normalizedSize
+      currentPageSize.value = sizeNorm
       currentPage.value = 1
     } else if (pageChanged) {
-      currentPage.value = normalizedPage
+      currentPage.value = pageNorm
     }
+
     loadComments()
-  },
+  }
 )
+
+const showConfirm = ref(false)
+const pendingDeleteId = ref<number | null>(null)
+const pendingDeletePreview = ref('')
+
+const deletingId = ref<number | null>(null)
+const deleteErrorId = ref<number | null>(null)
+
+const noticeMessage = ref('')
+const noticeType = ref<'success' | 'error'>('success')
+const noticeVisible = ref(false)
+
+function showNotice(msg: string, type: 'success' | 'error') {
+  noticeMessage.value = msg
+  noticeType.value = type
+  noticeVisible.value = true
+  setTimeout(() => {
+    noticeVisible.value = false
+  }, 2500)
+}
+
+function recomputeNewsStatus() {
+  if (props.news.notFakeCount > props.news.fakeCount) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.news.status = 'NOT_FAKE'
+  } else if (props.news.fakeCount > props.news.notFakeCount) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.news.status = 'FAKE'
+  } else {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.news.status = 'TIE'
+  }
+}
+
+function askDeleteComment(id: number, previewText: string) {
+  pendingDeleteId.value = id
+  pendingDeletePreview.value = previewText
+  showConfirm.value = true
+}
+
+function cancelDeleteComment() {
+  showConfirm.value = false
+  pendingDeleteId.value = null
+  pendingDeletePreview.value = ''
+  deleteErrorId.value = null
+}
+
+function confirmDeleteComment() {
+  if (pendingDeleteId.value === null) {
+    cancelDeleteComment()
+    return
+  }
+
+  const idToDelete = pendingDeleteId.value
+
+  // ปิด modal ก่อน
+  showConfirm.value = false
+  pendingDeleteId.value = null
+
+  // ล้าง preview
+  pendingDeletePreview.value = ''
+
+  // ทำงานหลัก
+  onDeleteComment(idToDelete)
+}
+
+function onDeleteComment(commentId: number) {
+  deleteErrorId.value = null
+  deletingId.value = commentId
+
+  // --- 1) optimistic update comment list
+  // หา comment ที่จะถูกลบก่อน เพื่อใช้ปรับคะแนนข่าว
+  const target = comments.value.find((c) => c.id === commentId)
+  if (target) {
+    // update score บนข่าวทันที
+    // สมมติว่า comment.voteLabel === 'NOT_FAKE' หมายถึงโหวตสนับสนุนว่า "ไม่ใช่ข่าวปลอม"
+    if (target.voteLabel === 'NOT_FAKE') {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.news.notFakeCount = Math.max(props.news.notFakeCount - 1, 0)
+    } else if (target.voteLabel === 'FAKE') {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.news.fakeCount = Math.max(props.news.fakeCount - 1, 0)
+    }
+
+    // คำนวณสถานะใหม่
+    recomputeNewsStatus()
+  }
+
+  // ตัดคอมเมนต์ออกจาก list ในจอทันที (optimistic)
+  comments.value = comments.value.filter((c) => c.id !== commentId)
+
+  // ลด totalComments ในจอทันทีด้วย
+  if (totalComments.value > 0) {
+    totalComments.value = totalComments.value - 1
+  }
+
+  // --- 2) call API ลบจริง
+  return CommentService.deleteComment(commentId)
+    .then(() => {
+      showNotice('Comment deleted.', 'success')
+      // reload อีกรอบจาก server เพื่อ sync ความจริง
+      return loadComments()
+    })
+    .catch(() => {
+      showNotice('Failed to delete comment.', 'error')
+      deleteErrorId.value = commentId
+      // reload ก็ยังควรทำ เพื่อคืน state ให้ตรงกับ backend
+      return loadComments()
+    })
+    .finally(() => {
+      deletingId.value = null
+    })
+}
+
 
 onMounted(() => {
   loadComments()
@@ -75,6 +187,53 @@ onMounted(() => {
 
 <template>
   <div class="flex justify-center px-4 py-8">
+
+    <!-- ===== Modal confirm delete comment ===== -->
+    <div
+      v-if="showConfirm"
+      class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000]
+             w-[90%] max-w-sm
+             bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200
+             p-4 flex flex-col gap-3"
+    >
+      <div class="text-sm font-semibold text-gray-800">
+        Delete this comment?
+      </div>
+
+      <div class="text-xs text-gray-600 break-words line-clamp-2">
+        {{ pendingDeletePreview }}
+      </div>
+
+      <div class="flex justify-end gap-2 text-xs font-medium">
+        <button
+          class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+          @click="cancelDeleteComment"
+        >
+          Cancel
+        </button>
+        <button
+          class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
+          @click="confirmDeleteComment"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== Toast notice ===== -->
+    <div
+      v-if="noticeVisible"
+      class="fixed top-6 left-1/2 -translate-x-1/2 z-[3000] pointer-events-none"
+    >
+      <div
+        class="text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg text-center min-w-[200px]"
+        :class="noticeType === 'success' ? 'bg-green-600' : 'bg-red-600'"
+      >
+        {{ noticeMessage }}
+      </div>
+    </div>
+
+
     <div
       class="w-full max-w-6xl xl:max-w-7xl rounded-2xl backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden"
     >
@@ -90,12 +249,33 @@ onMounted(() => {
           >
             Post on {{ news.created_at }}
           </span>
+          
+          <div class="flex items-center gap-2 text-[11px] font-medium">
+  
+  <div
+    class="inline-flex items-center gap-1 rounded-full border  px-2 py-0.5 bg-emerald-50 text-emerald-700 ring-emerald-200"
+  >
+    <span class="uppercase tracking-wide font-semibold text-[10px]">
+      NOT FAKE
+    </span>
+    <span class="text-[11px] font-normal">
+      {{ news.notFakeCount }}
+    </span>
+  </div>
 
-          <span
-            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
-          >
-            Fake {{ news.fakeCount }} - Not Fake {{ news.notFakeCount }}
-          </span>
+ 
+    <div
+    class="inline-flex items-center gap-1 rounded-full border  px-2 py-0.5 bg-red-50 text-red-700 ring-red-200"
+    >
+      <span class="uppercase tracking-wide font-semibold text-[10px]">
+      FAKE
+      </span>
+        <span class="text-[11px] font-normal">
+          {{ news.fakeCount }}
+        </span>
+        </div>
+      </div>
+
         </div>
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
           {{ news.topic }}
@@ -112,7 +292,7 @@ onMounted(() => {
       </div>
       <div class="px-6 md:px-8 mb-6">
         <h1 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
-          {{ news.short_detail }}
+          {{ news.shortDetail }}
         </h1>
       </div>
 
@@ -134,6 +314,9 @@ onMounted(() => {
           v-for="c in comments"
           :key="c.id"
           :comment="c"
+          :isDeleting="deletingId === c.id"
+          :hasError="deleteErrorId === c.id"
+          :onRequestDelete="askDeleteComment"
         />
       </div>
 

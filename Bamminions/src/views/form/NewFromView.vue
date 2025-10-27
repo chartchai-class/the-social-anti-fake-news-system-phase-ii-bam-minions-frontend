@@ -9,12 +9,12 @@ import type { News as NewsType } from '@/types'
 // Only the fields users should input
 const news = ref<{
   topic: string
-  short_detail: string
+  shortDetail: string
   detail: string
   image: string[]
 }>({
   topic: '',
-  short_detail: '',
+  shortDetail: '',
   detail: '',
   image: [],
 })
@@ -26,7 +26,7 @@ function saveNews() {
   // Send only user-entered fields; backend will fill id/created_at/reporter/status/counts/comments
   NewsService.saveNews({
     topic: news.value.topic,
-    short_detail: news.value.short_detail,
+    shortDetail: news.value.shortDetail,
     detail: news.value.detail,
     image: news.value.image,
   } as unknown as NewsType)
@@ -70,10 +70,10 @@ function saveNews() {
         </div>
 
         <div class="space-y-1">
-          <label for="short_detail" class="block font-medium">Short detail</label>
+          <label for="shortDetail" class="block font-medium">Short detail</label>
           <input
-            id="short_detail"
-            v-model="news.short_detail"
+            id="shortDetail"
+            v-model="news.shortDetail"
             type="text"
             class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
             placeholder="One-line summary"

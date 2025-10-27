@@ -16,7 +16,9 @@ export default {
     const { id, ...commentData } = comment
     return apiClient.post('/comments', commentData)
   },
-
+  deleteComment(id: number) {
+    return apiClient.delete('/comments/' + id)
+  }
   
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 

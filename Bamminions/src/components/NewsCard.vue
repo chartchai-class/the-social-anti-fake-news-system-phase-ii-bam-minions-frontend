@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { type News } from '@/types'
-import { computed } from 'vue'
 
 const props = defineProps<{
   news: News
@@ -11,11 +10,6 @@ const props = defineProps<{
   onRequestDelete: (id: number, title: string) => void
 }>()
 
-const displayStatus = computed(() => {
-  if (props.news.status === 'NOT_FAKE') return 'REAL'
-  if (props.news.status === 'FAKE') return 'FAKE'
-  return 'UNKNOWN'
-})
 
 function handleDelete() {
 if (props.isDeleting) return
@@ -61,19 +55,23 @@ if (props.isDeleting) return
           <span
           class="text-xs font-semibold px-2 py-1 rounded uppercase"
           :class="{
-          'bg-green-600 text-white': displayStatus === 'REAL',
-          'bg-red-600 text-white': displayStatus === 'FAKE',
-          'bg-gray-400 text-white': displayStatus === 'UNKNOWN'
-          }"
-          >
-          {{ displayStatus }}
-          </span>
+          'bg-green-600 text-white': news.status === 'NOT_FAKE',
+          'bg-red-600 text-white': news.status === 'FAKE',
+          'bg-yellow-400 text-black': news.status === 'TIE',
+          'bg-gray-400 text-white':
+          news.status !== 'NOT_FAKE' &&
+          news.status !== 'FAKE' &&
+          news.status !== 'TIE'
+        }"
+        >
+        {{ news.status === 'NOT_FAKE' ? 'NOT FAKE' : news.status }}
+        </span>
           <span class="text-sm opacity-80">{{ news.created_at }}</span>
         </div>
         <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
           {{ news.topic }}
         </h2>
-        <p class="text-lg font-medium opacity-90">{{ news.short_detail }}</p>
+        <p class="text-lg font-medium opacity-90">{{ news.shortDetail }}</p>
         <div class="mt-3 text-sm opacity-75">By {{ news.reporter?.firstname }} {{ news.reporter?.lastname }}</div>
       </div>
     </div>
@@ -95,20 +93,24 @@ if (props.isDeleting) return
           <span
           class="text-xs font-semibold px-2 py-1 rounded uppercase"
           :class="{
-          'bg-green-600 text-white': displayStatus === 'REAL',
-          'bg-red-600 text-white': displayStatus === 'FAKE',
-          'bg-gray-400 text-white': displayStatus === 'UNKNOWN'
-          }"
-          >
-          {{ displayStatus }}
-          </span>
+          'bg-green-600 text-white': news.status === 'NOT_FAKE',
+          'bg-red-600 text-white': news.status === 'FAKE',
+          'bg-yellow-400 text-black': news.status === 'TIE',
+          'bg-gray-400 text-white':
+          news.status !== 'NOT_FAKE' &&
+          news.status !== 'FAKE' &&
+          news.status !== 'TIE'
+        }"
+        >
+        {{ news.status }}
+        </span>
           <span class="text-xs text-gray-500">{{ news.created_at }}</span>
         </div>
 
         <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight">
           {{ news.topic }}
         </h2>
-        <p class="text-sm text-gray-600 mb-3">{{ news.short_detail }}</p>
+        <p class="text-sm text-gray-600 mb-3">{{ news.shortDetail }}</p>
 
         <div class="flex items-center text-xs font-medium text-gray-600">
           <span class="mr-2">By:</span>

@@ -17,12 +17,18 @@ export default {
     const { id, ...newsData } = news
     return apiClient.post('/news', newsData)
   },
-  getNewsByKeyword(keyword: string, perPage: number, page: number) :
+
+  getNewsByKeyword(value: string, perPage: number, page: number) :
     Promise<AxiosResponse<NewsType[]>>{
-      return apiClient.get<NewsType[]>('/news?title=' + keyword + '&_limit=' +
+      return apiClient.get<NewsType[]>('/news?topic=' + value + '&_limit=' +
         perPage + '&_page=' + page, )
     },
     deleteNews(id: number) {
       return apiClient.delete('/news/' + id)
-    }
+    },
+
+
+
+
+
 }

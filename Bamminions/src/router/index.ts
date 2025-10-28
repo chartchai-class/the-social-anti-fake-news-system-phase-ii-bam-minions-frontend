@@ -8,7 +8,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
 import NewsVoteView from '@/views/News/NewsVoteView.vue'
 import NewFromView from '@/views/form/NewFromView.vue'
-import AdminDashboard from '@/views/AdminDashboard.vue'
+import AdminDashboard from '@/views/Admin/AdminDashboard.vue'
+import AdminNewsListView from '@/views/Admin/AdminNewsListView.vue'
+import AdminCommentsView from '@/views/Admin/AdminCommentsView.vue'
+import AdminUserView from '@/views/Admin/AdminUserView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,6 +90,73 @@ const router = createRouter({
           pageSize: isNaN(pageSize) ? 10 : pageSize,
         }
       },
+    },
+   
+  {
+      path: '/admin',
+      component: AdminDashboard,     
+      children: [
+
+        {
+          path: 'user',
+          name: 'admin-user',
+          component: AdminUserView,
+          props: (route) => {
+            const page = parseInt((route.query.page as string) || '1')
+            const pageSize = parseInt((route.query.pageSize as string) || '10')
+            const filter = (route.query.filter as string) || 'removed' // default: removed
+            return {
+              page: isNaN(page) ? 1 : page,
+              pageSize: isNaN(pageSize) ? 10 : pageSize,
+              filter,
+            }
+          },
+        },
+        {
+          path: '',
+          name: 'admin-news',
+          component: AdminNewsListView,
+          props: (route) => {
+            const page = parseInt((route.query.page as string) || '1')
+            const pageSize = parseInt((route.query.pageSize as string) || '10')
+            const filter = (route.query.filter as string) || 'removed' // default: removed
+            return {
+              page: isNaN(page) ? 1 : page,
+              pageSize: isNaN(pageSize) ? 10 : pageSize,
+              filter,
+            }
+          },
+        },
+        {
+          path: '',
+          name: 'admin-news',
+          component: AdminNewsListView,
+          props: (route) => {
+            const page = parseInt((route.query.page as string) || '1')
+            const pageSize = parseInt((route.query.pageSize as string) || '10')
+            const filter = (route.query.filter as string) || 'removed' // default: removed
+            return {
+              page: isNaN(page) ? 1 : page,
+              pageSize: isNaN(pageSize) ? 10 : pageSize,
+              filter,
+            }
+          },
+        },
+        {
+          path: 'news/:newsId/comments',
+          name: 'admin-news-comments',
+          component: AdminCommentsView,
+          props: (route) => {
+            const page = parseInt((route.query.page as string) || '1')
+            const pageSize = parseInt((route.query.pageSize as string) || '10')
+            return {
+              newsId: Number(route.params.newsId),
+              page: isNaN(page) ? 1 : page,
+              pageSize: isNaN(pageSize) ? 10 : pageSize,
+            }
+          },
+        },
+      ],
     },
   ],
 })

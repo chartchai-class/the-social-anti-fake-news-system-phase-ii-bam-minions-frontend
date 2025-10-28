@@ -18,8 +18,11 @@ export default {
   },
   deleteComment(id: number) {
     return apiClient.delete('/comments/' + id)
-  }
+  },
   
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
+  adminRemoveComment(id: number) {
+    return apiClient.put(`/admin/comments/${id}/remove`)
+  },
 }

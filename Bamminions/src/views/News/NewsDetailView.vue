@@ -164,7 +164,7 @@ function onDeleteComment(commentId: number) {
   }
 
   // --- 2) call API ลบจริง
-  return CommentService.deleteComment(commentId)
+  return CommentService.adminRemoveComment(commentId)
     .then(() => {
       showNotice('Comment deleted.', 'success')
       // reload อีกรอบจาก server เพื่อ sync ความจริง

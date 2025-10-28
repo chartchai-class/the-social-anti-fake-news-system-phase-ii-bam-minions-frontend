@@ -128,7 +128,7 @@ function onDeleteNews(id: number) {
   } else {
     otherNews.value = otherNews.value.filter((n) => n.id !== id)
   }
-  return NewsService.deleteNews(id)
+  return NewsService.adminRemoveNews(id)
     .then(() => {
       showNotice('News deleted.', 'success')
       return loadEvents()

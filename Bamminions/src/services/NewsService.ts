@@ -23,9 +23,25 @@ export default {
       return apiClient.get<NewsType[]>('/news?topic=' + value + '&_limit=' +
         perPage + '&_page=' + page, )
     },
+
     deleteNews(id: number) {
       return apiClient.delete('/news/' + id)
     },
+
+   adminListNews(filter: string, perPage: number, page: number) {
+    return apiClient.get(`/admin/news?filter=${encodeURIComponent(filter)}&_limit=${perPage}&_page=${page}`)
+  },
+  adminRemoveNews(id: number) {
+    return apiClient.put(`/admin/news/${id}/remove`)
+  },
+
+  // ===== Admin • Comments =====
+  adminListComments(newsId: number, perPage: number, page: number) {
+    return apiClient.get(`/admin/news/${newsId}/comments?_limit=${perPage}&_page=${page}`)
+  },
+  adminRemoveComment(commentId: number) {
+    return apiClient.put(`/admin/comments/${commentId}/remove`)
+  },
 
 
 

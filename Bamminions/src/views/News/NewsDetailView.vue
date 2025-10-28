@@ -243,43 +243,44 @@ onMounted(() => {
       class="w-full max-w-6xl xl:max-w-7xl rounded-2xl backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden"
     >
       <div class="p-6 md:p-8 space-y-4">
+        
         <div class="flex flex-wrap items-center gap-2">
+        
           <span
-            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
+            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
           >
             Post by {{ news.reporter.firstname }} {{ news.reporter.lastname }}
           </span>
           <span
-            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200"
+            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
           >
             Post on {{ news.created_at }}
           </span>
           
-          <div class="flex items-center gap-2 text-[11px] font-medium">
-  
+          <div class="ml-auto flex items-center gap-2 text-[12px] font-medium">
   <div
-    class="inline-flex items-center gap-1 rounded-full border  px-2 py-0.5 bg-emerald-50 text-emerald-700 ring-emerald-200"
+    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-white text-green-600"
   >
-    <span class="uppercase tracking-wide font-semibold text-[10px]">
+    <span class="uppercase tracking-wide font-bold text-[18px]">
       NOT FAKE
     </span>
-    <span class="text-[11px] font-normal">
+    <span class="text-[18px] font-semibold">
       {{ news.notFakeCount }}
     </span>
   </div>
 
- 
-    <div
-    class="inline-flex items-center gap-1 rounded-full border  px-2 py-0.5 bg-red-50 text-red-700 ring-red-200"
-    >
-      <span class="uppercase tracking-wide font-semibold text-[10px]">
+  <div
+    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-white text-red-600"
+  >
+    <span class="uppercase tracking-wide font-bold text-[18px]">
       FAKE
-      </span>
-        <span class="text-[11px] font-normal">
-          {{ news.fakeCount }}
-        </span>
-        </div>
-      </div>
+    </span>
+    <span class="text-[18px] font-semibold">
+      {{ news.fakeCount }}
+    </span>
+  </div>
+</div>
+
 
         </div>
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">

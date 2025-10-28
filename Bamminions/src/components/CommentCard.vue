@@ -21,30 +21,38 @@ function handleDeleteComment() {
 
 <template>
   <div
-    class="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 pt-12 space-y-3"
+    class="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 space-y-3"
   >
-    <!-- meta (top-left) -->
-    <div class="absolute top-2 left-3 text-[11px] text-gray-600">
-      <div class="font-medium text-gray-700">
-        by {{ comment.usercomment.firstname }} {{ comment.usercomment.lastname }}
-      </div>
-      <div class="text-[10px] text-gray-500">
-        {{ comment.created_at }}
+  <div class="flex items-start justify-between">
+    <div class="flex items-start gap-3">
+      <img
+        class="h-12 w-12 rounded-full object-cover sm:h-12 sm:w-12"
+        :src="comment.image && comment.image.length ? comment.image[0] : '/img/erin-lindford.jpg'"
+        alt="comment avatar"
+      />
+
+      <div class="flex flex-col">
+        <span class="text-[18px] font-semibold text-black leading-snug">
+          {{ comment.usercomment.firstname }} {{ comment.usercomment.lastname }}
+        </span>
+        <span class="text-[10px] text-gray-500 leading-snug">
+          {{ comment.created_at }}
+        </span>
       </div>
     </div>
 
-    <!-- status badge (top-right, no icon) -->
     <span
-      class="absolute top-2 right-3 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 uppercase tracking-wide"
+      class="inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-bold uppercase tracking-wide ring-1 leading-none"
       :class="
         comment.voteLabel === 'NOT_FAKE'
-          ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
-          : 'bg-red-50 text-red-700 ring-red-200'
+          ? 'bg-white text-green-600 '
+          : 'bg-white text-red-600'
       "
     >
       {{ comment.voteLabel === 'NOT_FAKE' ? 'NOT FAKE' : 'FAKE' }}
     </span>
-
+  
+  </div>
      <button
       v-if="auth.isAdmin === true"
       class="text-[10px] font-semibold text-red-200 bg-red-600 rounded px-2 py-[2px] hover:bg-red-50 hover:text-red-700 absolute bottom-2 right-3

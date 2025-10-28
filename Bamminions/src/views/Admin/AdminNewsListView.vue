@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router'
 
 const props = defineProps<{ page: number; pageSize: number; filter: string }>()
 const router = useRouter()
-
 const items = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)
@@ -14,7 +13,6 @@ const err = ref<string | null>(null)
 const page = computed(() => props.page)
 const pageSize = computed(() => props.pageSize)
 const filter = computed(() => (props.filter || 'removed').toLowerCase())
-
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize.value)))
 
 function load() {
@@ -28,13 +26,12 @@ function load() {
     .catch((e) => (err.value = e?.message ?? 'load error'))
     .finally(() => (loading.value = false))
 }
-
 function goFilter(nextFilter: string) {
-  router.push({ name: 'admin-news', query: { filter: nextFilter, page: 1, pageSize: pageSize.value } })
+  router.push({
+    name: 'admin-news',
+    query: { filter: nextFilter, page: 1, pageSize: pageSize.value },
+  })
 }
-
-
-
 function openComments(newsId: number) {
   router.push({ name: 'admin-news-comments', params: { newsId }, query: { page: 1, pageSize: 10 } })
 }
@@ -44,48 +41,113 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="p-6">
-    <h1 class="text-xl font-bold mb-4">Admin • News</h1>
-
-    <div class="flex gap-2 mb-4">
-      <button class="px-3 py-1 rounded border" :class="filter==='removed' && 'bg-black text-white'"
-              @click="goFilter('removed')">Removed</button>
-      <button class="px-3 py-1 rounded border" :class="filter==='active' && 'bg-black text-white'"
-              @click="goFilter('active')">Active</button>
-      <button class="px-3 py-1 rounded border" :class="filter==='all' && 'bg-black text-white'"
-              @click="goFilter('all')">All</button>
+  <section class="max-w-5xl mx-auto p-4 backdrop-blur shadow-xl rounded-xl p-5">
+    <!-- Header -->
+    <div class="mb-4 flex items-center justify-end">
+      <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700">
+        Total : {{ total }}
+      </span>
     </div>
 
-    <div v-if="loading">Loading…</div>
-    <div v-else-if="err" class="text-red-600">{{ err }}</div>
-
-    <div v-else class="space-y-3">
-      <div v-for="n in items" :key="n.id" class="p-3 rounded border bg-white/80 flex items-center gap-3">
-        <img v-if="n.image?.length" :src="n.image[0]" class="w-20 h-14 object-cover rounded" />
-        <div class="flex-1">
-          <div class="font-semibold">
-            {{ n.topic }}
-            <span v-if="n.removed" class="ml-2 text-xs px-2 py-0.5 rounded bg-red-100 text-red-700">REMOVED</span>
-          </div>
-          <div class="text-xs text-gray-500">
-            {{ n.created_at }} • fake={{ n.fakeCount }} • notFake={{ n.notFakeCount }} • status={{ n.status }}
-          </div>
-        </div>
-
-        <button class="px-3 py-1 rounded border" @click="openComments(n.id)">Comments</button>
+    <!-- Filters (basic) -->
+    <div class="mb-4 flex items-center gap-2">
+      <span class="text-sm text-gray-700">Filter</span>
+      <div class="ml-auto flex gap-2">
+        <button
+          class="px-3 py-1 rounded border text-sm"
+          :class="
+            filter === 'removed'
+              ? 'bg-black text-white border-black'
+              : 'bg-white text-gray-900 border-gray-300'
+          "
+          @click="goFilter('removed')"
+        >
+          Removed
+        </button>
+        <button
+          class="px-3 py-1 rounded border text-sm"
+          :class="
+            filter === 'active'
+              ? 'bg-black text-white border-black'
+              : 'bg-white text-gray-900 border-gray-300'
+          "
+          @click="goFilter('active')"
+        >
+          Active
+        </button>
+        <button
+          class="px-3 py-1 rounded border text-sm"
+          :class="
+            filter === 'all'
+              ? 'bg-black text-white border-black'
+              : 'bg-white text-gray-900 border-gray-300'
+          "
+          @click="goFilter('all')"
+        >
+          All
+        </button>
       </div>
     </div>
 
-    <div class="mt-4 flex items-center gap-2">
-      <router-link v-if="page>1"
-                   :to="{ name:'admin-news', query:{ filter: filter, page: page-1, pageSize } }">
-        <button class="px-3 py-1 rounded border">‹ Prev</button>
+    <!-- States -->
+    <div v-if="loading" class="p-3 rounded border bg-white">Loading…</div>
+    <div v-else-if="err" class="p-3 rounded border bg-white">
+      <div class="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1">
+        {{ err }}
+      </div>
+    </div>
+
+    <!-- List -->
+    <div v-else class="space-y-3">
+      <div v-for="n in items" :key="n.id" class="p-3 rounded bg-white flex items-center gap-3">
+        <img
+          v-if="n.image?.length"
+          :src="n.image[0]"
+          alt=""
+          class="w-20 h-14 object-cover rounded"
+        />
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <h3 class="font-semibold text-gray-900 truncate">{{ n.topic }}</h3>
+            <span
+              v-if="n.removed"
+              class="text-[11px] px-2 py-0.5 rounded-full border bg-red-50 text-red-700"
+              >REMOVED</span
+            >
+          </div>
+          <p class="text-xs text-gray-500 truncate">
+            {{ n.created_at }} • fake={{ n.fakeCount }} • notFake={{ n.notFakeCount }} • status={{
+              n.status
+            }}
+          </p>
+        </div>
+
+        <button
+          class="ml-auto px-3 py-1 rounded text-white text-sm bg-green-600 hover:bg-green-500"
+          @click="openComments(n.id)"
+        >
+          Comments
+        </button>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4 flex items-center gap-2 justify-end">
+      <router-link
+        v-if="page > 1"
+        :to="{ name: 'admin-news', query: { filter: filter, page: page - 1, pageSize } }"
+      >
+        <button class="px-3 py-1 rounded border text-sm bg-white hover:bg-gray-50">‹ Prev</button>
       </router-link>
-      <div class="text-sm">Page {{ page }} / {{ totalPages }}</div>
-      <router-link v-if="page<totalPages"
-                   :to="{ name:'admin-news', query:{ filter: filter, page: page+1, pageSize } }">
-        <button class="px-3 py-1 rounded border">Next ›</button>
+
+      <div class="text-sm text-gray-700">Page {{ page }} / {{ totalPages }}</div>
+
+      <router-link
+        v-if="page < totalPages"
+        :to="{ name: 'admin-news', query: { filter: filter, page: page + 1, pageSize } }"
+      >
+        <button class="px-3 py-1 rounded border text-sm bg-white hover:bg-gray-50">Next ›</button>
       </router-link>
     </div>
-  </div>
+  </section>
 </template>

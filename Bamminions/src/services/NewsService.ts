@@ -28,6 +28,12 @@ export default {
       return apiClient.delete('/news/' + id)
     },
 
+    getNewsByStatus(status: string, perPage: number, page: number) :
+    Promise<AxiosResponse<NewsType[]>>{
+      return apiClient.get<NewsType[]>('/news?status=' + status + '&_limit=' +
+        perPage + '&_page=' + page, )
+    },
+
    adminListNews(filter: string, perPage: number, page: number) {
     return apiClient.get(`/admin/news?filter=${encodeURIComponent(filter)}&_limit=${perPage}&_page=${page}`)
   },

@@ -87,10 +87,24 @@ function confirmDelete() {
   return onDeleteNews(idToDelete)
 }
 
+const isPageSizeMenuOpen = ref(false)
+
+const isStatusMenuOpen = ref(false)
+
+function selectStatus(value: string) {
+  statusFilter.value = value
+  isStatusMenuOpen.value = false
+  loadEvents()
+}
+
+const statusFilter = ref('')
 const keyword = ref('')
+
 function loadEvents() {
   let queryFunction
-  if (keyword.value === '') {
+  if (statusFilter.value && statusFilter.value !== '') {
+    queryFunction = NewsService.getNewsByStatus(statusFilter.value, pageSize.value, page.value)
+  } else if (keyword.value === '') {
     queryFunction = NewsService.getNews(pageSize.value, page.value)
   } else {
     queryFunction = NewsService.getNewsByKeyword(keyword.value, pageSize.value, page.value)
@@ -151,17 +165,17 @@ onMounted(() => {
 <template>
   <div
     v-if="showConfirm"
-    class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
+    class="bg-gray-800 fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm text-gray-900 rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
   >
-    <div class="text-sm font-semibold text-gray-800">Delete this news?</div>
+    <div class="text-sm font-semibold text-white">Delete this news?</div>
 
-    <div class="text-xs text-gray-600 break-words line-clamp-2">
+    <div class="text-xs text-white break-words line-clamp-2">
       {{ pendingDeleteTitle }}
     </div>
 
     <div class="flex justify-end gap-2 text-xs font-medium">
       <button
-        class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+        class="px-3 py-1.5 rounded-lg border border-gray-300 text-white hover:bg-gray-500"
         @click="cancelDelete"
       >
         Cancel
@@ -186,33 +200,8 @@ onMounted(() => {
     </div>
   </div>
 
-  <div class="flex justify-center gap-4 my-6">
-    <router-link
-      v-for="size in pageSizeOption"
-      :key="size"
-      :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
-    >
-      <button
-        class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-500 transition"
-        :class="{ 'bg-black text-white font-semibold': pageSize === size }"
-      >
-        {{ size }} per page
-      </button>
-    </router-link>
-  </div>
-
-  <div>
-    <input
-      v-model="keyword"
-      type="text"
-      placeholder="Search..."
-      @input="loadEvents"
-      class="border rounded px-2 py-1 w-64 mx-auto block mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-    />
-  </div>
-
   <router-link
-  v-if="auth.isMember || auth.isAdmin"
+    v-if="auth.isMember || auth.isAdmin"
     :to="{ name: 'add-news' }"
     aria-label="Add News"
     class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full px-4 py-3 font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
@@ -225,8 +214,128 @@ onMounted(() => {
     <BaseInput v-model="keyword" label="Search..." @input="loadEvents" class="w-full" />
   </div>
 
-  <div class="pt-8 pb-16 min-h-screen bg-gradient-to-b from-gray-700">
+  <div class="pt-8 pb-16 min-h-screen">
     <div class="container mx-auto px-4 md:px-50">
+      <div class="mb-4 flex justify-start">
+        <div class="relative inline-block text-left">
+          <button
+            type="button"
+            class="inline-flex min-w-[140px] items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            @click="isStatusMenuOpen = !isStatusMenuOpen"
+          >
+            <span>
+              <span v-if="statusFilter === ''">ALL</span>
+              <span v-else-if="statusFilter === 'FAKE'">FAKE</span>
+              <span v-else-if="statusFilter === 'NOT_FAKE'">NOT FAKE</span>
+              <span v-else-if="statusFilter === 'TIE'">TIE</span>
+              <span v-else>{{ statusFilter }}</span>
+            </span>
+          </button>
+
+          <div
+            v-if="isStatusMenuOpen"
+            class="absolute z-40 mt-2 w-40 origin-top-left rounded-md border shadow-lg ring-1 ring-black/5 focus:outline-none"
+          >
+            <ul class="py-1 text-sm text-gray-700">
+              <li>
+                <button
+                  class="flex w-full items-center justify-between px-3 py-2 text-black bg-gray-400 hover:bg-gray-300 text-left"
+                  @click="selectStatus('')"
+                >
+                  <span>ALL</span>
+                  <span v-if="statusFilter === ''" class="h-2 w-2 rounded-full bg-gray-400"></span>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  class="flex w-full items-center justify-between px-3 py-2 bg-red-600 hover:bg-red-500 text-left text-white"
+                  @click="selectStatus('FAKE')"
+                >
+                  <span>FAKE</span>
+                  <span
+                    v-if="statusFilter === 'FAKE'"
+                    class="h-2 w-2 rounded-full bg-red-600"
+                  ></span>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  class="flex w-full items-center justify-between px-3 py-2 bg-green-600 hover:bg-green-500 text-left text-white"
+                  @click="selectStatus('NOT_FAKE')"
+                >
+                  <span>NOT FAKE</span>
+                  <span
+                    v-if="statusFilter === 'NOT_FAKE'"
+                    class="h-2 w-2 rounded-full bg-green-600"
+                  ></span>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  class="flex w-full items-center justify-between px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-left text-black"
+                  @click="selectStatus('TIE')"
+                >
+                  <span>TIE</span>
+                  <span
+                    v-if="statusFilter === 'TIE'"
+                    class="h-2 w-2 rounded-full bg-yellow-500"
+                  ></span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="relative inline-block text-left ml-5">
+          <button
+            type="button"
+            class="inline-flex min-w-[160px] items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            @click="isPageSizeMenuOpen = !isPageSizeMenuOpen"
+          >
+            <span>{{ pageSize }} per page</span>
+
+            <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <div
+            v-if="isPageSizeMenuOpen"
+            class="absolute z-50 mt-2 w-44 origin-top-left rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+          >
+            <ul class="py-1 text-sm text-gray-700 max-h-60 overflow-auto">
+              <li v-for="size in pageSizeOption" :key="size">
+                <router-link
+                  :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
+                  class="flex w-full items-center justify-between px-3 py-2 hover:bg-gray-100 text-left"
+                  @click="isPageSizeMenuOpen = false"
+                >
+                  <span>{{ size }} per page</span>
+
+                  <span v-if="pageSize === size" class="h-2 w-2 rounded-full bg-black"></span>
+                </router-link>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="inline-block ml-2">
+          <input
+            v-model="keyword"
+            type="text"
+            placeholder="Search..."
+            @input="loadEvents"
+            class="border border-white bg-white text-black rounded px-3 py-2 text-sm w-64 focus:outline-none"
+          />
+        </div>
+      </div>
+
       <div class="flex justify-center mb-10">
         <NewsCard
           v-if="specials"
@@ -250,6 +359,7 @@ onMounted(() => {
         />
       </div>
 
+      <!-- pagination -->
       <div class="mt-5 justify-center flex text-sm font-medium text-gray-200">
         Page {{ page }} of {{ totalPages }}
         <span v-if="totalNews"> </span>

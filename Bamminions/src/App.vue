@@ -12,7 +12,10 @@ if (token && user) {
 }
 </script>
 <template>
-  <div id="app" class="min-h-screen pt-16 relative min-h-screen bg-gradient-to-b bg-gray-700">
+  <div id="app" class="bg-center min-h-screen pt-16 relative min-h-screen"
+    :style="{
+      backgroundImage: 'url(https://i.gifer.com/6bHy.gif)'
+    }">
     <Navbar />
     <Router-view />
   </div>

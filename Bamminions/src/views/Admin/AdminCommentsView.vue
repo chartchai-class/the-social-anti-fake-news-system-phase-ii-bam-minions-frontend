@@ -6,6 +6,7 @@ const props = defineProps<{ newsId: number; page: number; pageSize: number }>()
 const items = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)
+const deletingId = ref<number | null>(null)
 
 const page = computed(() => props.page)
 const pageSize = computed(() => props.pageSize)
@@ -22,7 +23,12 @@ function load() {
 }
 
 function removeComment(id: number) {
-  NewsService.adminRemoveComment(id).then(load).catch(load)
+  if (deletingId.value) return
+  deletingId.value = id
+  NewsService.adminRemoveComment(id)
+    .then(load)
+    .catch(load)
+    .finally(() => (deletingId.value = null))
 }
 
 watch(() => [page.value, pageSize.value, props.newsId], load, { immediate: true })
@@ -30,49 +36,115 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="p-6">
-    <h1 class="text-xl font-bold mb-4">Admin • Comments (news #{{ props.newsId }})</h1>
+  <!-- match user view container -->
+  <section class="max-w-3xl mx-auto backdrop-blur shadow-xl rounded-xl p-4">
+    <!-- Header: title + total pill -->
+    <div class="mb-4 flex items-center justify-end">
+      <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700">
+        Total : {{ total }}
+      </span>
+    </div>
 
-    <div v-if="loading">Loading…</div>
+    <div class="mb-3 flex items-center justify-between">
+      <h1 class="text-lg font-semibold text-gray-900">
+        Comments <span class="text-gray-500">(news #{{ props.newsId }}) </span>
+        <span> </span>
+      </h1>
 
+      <!-- RED cancel on the right -->
+      <router-link :to="{ name: 'admin-news', query: { filter: 'active', page: 1, pageSize: 10 } }">
+        <button
+          class="px-3 py-1 rounded border text-sm bg-red-600 text-white border-red-600 hover:bg-red-700"
+          aria-label="Cancel and go back to News"
+        >
+          Cancel
+        </button>
+      </router-link>
+    </div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="p-3 rounded bg-white">Loading…</div>
+
+    <!-- Empty -->
+    <div v-else-if="items.length === 0" class="p-3 rounded bg-white text-sm text-gray-600">
+      No comments found.
+    </div>
+
+    <!-- List (simple white cards with border, like user view) -->
     <div v-else class="space-y-3">
-      <div
-        v-for="c in items"
-        :key="c.id"
-        class="p-3 rounded border bg-white/80 flex items-start justify-between gap-3"
-      >
-        <div class="flex-1">
+      <article v-for="c in items" :key="c.id" class="p-3 rounded bg-white flex items-start gap-3">
+        <div class="flex-1 min-w-0">
           <div class="text-sm">
             <span class="font-semibold">{{ c.usercomment?.username || 'unknown' }}</span>
             <span class="text-gray-500"> • {{ c.created_at }}</span>
           </div>
-          <div class="text-sm mt-1">{{ c.content }}</div>
-          <div class="text-xs text-gray-500 mt-1">
+          <p class="text-sm mt-1 break-words">{{ c.content }}</p>
+          <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
             voteLabel={{ c.voteLabel || '—' }}
-            <span v-if="c.removed" class="ml-2 px-2 py-0.5 rounded bg-red-100 text-red-700">REMOVED</span>
+            <span
+              v-if="c.removed"
+              class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 text-red-700"
+            >
+              REMOVED
+            </span>
           </div>
         </div>
 
-        <button class="px-3 py-1 rounded bg-red-600 text-white" @click="removeComment(c.id)">Soft delete</button>
-      </div>
+        <!-- action button in user-view style (bordered, subtle hover) -->
+        <button
+          class="px-3 py-1 rounded border text-sm"
+          :class="
+            deletingId === c.id || c.removed
+              ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+              : 'bg-white text-red-700 border-red-300 hover:bg-red-50'
+          "
+          :disabled="deletingId === c.id || c.removed"
+          @click="removeComment(c.id)"
+        >
+          {{ deletingId === c.id ? 'Deleting…' : 'Soft delete' }}
+        </button>
+      </article>
     </div>
 
-    <div class="mt-4 flex items-center gap-2">
+    <!-- Pagination (centered, basic bordered buttons like user view) -->
+    <nav class="mt-4 flex items-center justify-center gap-5">
       <router-link
-        v-if="page>1"
-        :to="{ name:'admin-news-comments', params:{ newsId: props.newsId }, query:{ page: page-1, pageSize } }"
+        v-if="page > 1"
+        :to="{
+          name: 'admin-news-comments',
+          params: { newsId: props.newsId },
+          query: { page: page - 1, pageSize },
+        }"
       >
-        <button class="px-3 py-1 rounded border">‹ Prev</button>
+        <button class="px-3 py-1 rounded border text-sm bg-white hover:bg-gray-50">‹ Prev</button>
       </router-link>
+      <button
+        v-else
+        class="px-3 py-1 rounded border text-sm bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+        aria-disabled="true"
+      >
+        ‹ Prev
+      </button>
 
-      <div class="text-sm">Page {{ page }} / {{ totalPages }}</div>
+      <div class="text-sm text-gray-700">Page {{ page }} of {{ totalPages }}</div>
 
       <router-link
-        v-if="page<totalPages"
-        :to="{ name:'admin-news-comments', params:{ newsId: props.newsId }, query:{ page: page+1, pageSize } }"
+        v-if="page < totalPages"
+        :to="{
+          name: 'admin-news-comments',
+          params: { newsId: props.newsId },
+          query: { page: page + 1, pageSize },
+        }"
       >
-        <button class="px-3 py-1 rounded border">Next ›</button>
+        <button class="px-3 py-1 rounded border text-sm bg-white hover:bg-gray-50">Next ›</button>
       </router-link>
-    </div>
-  </div>
+      <button
+        v-else
+        class="px-3 py-1 rounded border text-sm bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+        aria-disabled="true"
+      >
+        Next ›
+      </button>
+    </nav>
+  </section>
 </template>

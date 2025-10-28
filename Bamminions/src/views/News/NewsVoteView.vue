@@ -60,7 +60,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="p-4 sm:p-5 rounded-2xl backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden dark:ring-white/10 shadow-md space-y-4 max-w-xl center mx-auto"
+    class="mt-13 p-4 sm:p-5 rounded-2xl backdrop-blur border border-white space-y-4 max-w-xl center mx-auto"
   >
     <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white text-center">
       Vote on this News

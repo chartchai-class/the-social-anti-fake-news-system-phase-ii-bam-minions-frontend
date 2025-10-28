@@ -23,14 +23,17 @@ function handleDeleteComment() {
   <div
     class="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 space-y-3"
   >
-  <div class="flex items-start justify-between">
+  <div class="flex items-start justify-between ">
     <div class="flex items-start gap-3">
+      <div v-if="comment.usercomment.image?.length">
       <img
+        v-for="image in comment.usercomment.image"
+        :key="image"
+        :src="image"
+        alt="comment image"
         class="h-12 w-12 rounded-full object-cover sm:h-12 sm:w-12"
-        :src="comment.image && comment.image.length ? comment.image[0] : '/img/erin-lindford.jpg'"
-        alt="comment avatar"
       />
-
+      </div>
       <div class="flex flex-col">
         <span class="text-[18px] font-semibold text-black leading-snug">
           {{ comment.usercomment.firstname }} {{ comment.usercomment.lastname }}
@@ -42,11 +45,11 @@ function handleDeleteComment() {
     </div>
 
     <span
-      class="inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-bold uppercase tracking-wide ring-1 leading-none"
+      class="inline-flex items-center px-2 py-1 rounded uppercase text-[14px] font-bold uppercase tracking-wide ring-1 leading-none"
       :class="
         comment.voteLabel === 'NOT_FAKE'
-          ? 'bg-white text-green-600 '
-          : 'bg-white text-red-600'
+          ? 'bg-green-600 text-white '
+          : 'bg-red-600 text-white '
       "
     >
       {{ comment.voteLabel === 'NOT_FAKE' ? 'NOT FAKE' : 'FAKE' }}

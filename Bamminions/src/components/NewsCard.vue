@@ -55,7 +55,7 @@ if (props.isDeleting) return
       <div class="relative z-10 w-full">
         <div class="flex items-center space-x-3 mb-3">
           <span
-          class="text-xs font-semibold px-2 py-1 rounded uppercase"
+          class="text-[14px] font-bold px-2 py-1 rounded uppercase"
           :class="{
           'bg-green-600 text-white': news.status === 'NOT_FAKE',
           'bg-red-600 text-white': news.status === 'FAKE',
@@ -67,14 +67,27 @@ if (props.isDeleting) return
         }"
         >
         {{ news.status === 'NOT_FAKE' ? 'NOT FAKE' : news.status }}
-        </span>
-          <span class="text-sm opacity-80">{{ news.created_at }}</span>
+      </span>
         </div>
         <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
           {{ news.topic }}
         </h2>
-        <p class="text-lg font-medium opacity-90">{{ news.shortDetail }}</p>
-        <div class="mt-3 text-sm opacity-75">By {{ news.reporter?.firstname }} {{ news.reporter?.lastname }}</div>
+        <div class="flex items-start gap-3">
+        <img
+        class="h-12 w-12 rounded-full object-cover sm:h-12 sm:w-12"
+        :src="news.reporter.image && news.reporter.image.length ? news.reporter.image[0] : ''"
+        alt="comment avatar"
+      />
+
+      <div class="flex flex-col">
+        <span class="text-[18px] font-semibold text-white leading-snug">
+          {{ news.reporter.firstname }} {{ news.reporter.lastname }}
+        </span>
+        <span class="text-[10px] text-gray-500 leading-snug">
+          {{ news.created_at }}
+        </span>
+      </div>
+    </div>
       </div>
     </div>
  
@@ -93,7 +106,7 @@ if (props.isDeleting) return
       <div class="w-2/3 p-5">
         <div class="flex items-center space-x-2 mb-2">
           <span
-          class="text-xs font-semibold px-2 py-1 rounded uppercase"
+          class="text-[14px] font-bold px-2 py-1 rounded uppercase"
           :class="{
           'bg-green-600 text-white': news.status === 'NOT_FAKE',
           'bg-red-600 text-white': news.status === 'FAKE',
@@ -104,9 +117,8 @@ if (props.isDeleting) return
           news.status !== 'TIE'
         }"
         >
-        {{ news.status }}
+         {{ news.status === 'NOT_FAKE' ? 'NOT FAKE' : news.status }}
         </span>
-          <span class="text-xs text-gray-500">{{ news.created_at }}</span>
         </div>
 
         <h2 class="text-xl font-bold text-gray-900 mb-2 leading-tight">
@@ -114,10 +126,22 @@ if (props.isDeleting) return
         </h2>
         <p class="text-sm text-gray-600 mb-3">{{ news.shortDetail }}</p>
 
-        <div class="flex items-center text-xs font-medium text-gray-600">
-          <span class="mr-2">By:</span>
-          <span class="text-emerald-700">{{ news.reporter?.firstname }} {{ news.reporter?.lastname }}</span>
-        </div>
+        <div class="flex items-start gap-3">
+        <img
+        class="h-12 w-12 rounded-full object-cover sm:h-12 sm:w-12"
+        :src="news.reporter.image && news.reporter.image.length ? news.reporter.image[0] : '/img/erin-lindford.jpg'"
+        alt="comment avatar"
+      />
+
+      <div class="flex flex-col">
+        <span class="text-[18px] font-semibold text-black leading-snug">
+          {{ news.reporter.firstname }} {{ news.reporter.lastname }}
+        </span>
+        <span class="text-[10px] text-gray-500 leading-snug">
+          {{ news.created_at }}
+        </span>
+      </div>
+    </div>
       </div>
     </div>
   </router-link>

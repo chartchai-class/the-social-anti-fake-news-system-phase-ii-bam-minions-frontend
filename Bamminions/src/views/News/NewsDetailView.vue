@@ -192,7 +192,7 @@ onMounted(() => {
 
     <!-- ===== Modal confirm delete comment ===== -->
     <div
-      v-if="showConfirm"
+      v-if="auth.isAdmin === true && showConfirm"
       class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000]
              w-[90%] max-w-sm
              bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200
@@ -240,74 +240,86 @@ onMounted(() => {
 
 
     <div
-      class="w-full max-w-6xl xl:max-w-7xl rounded-2xl backdrop-blur shadow-xl ring-1 ring-black/5 overflow-hidden"
-    >
-      <div class="p-6 md:p-8 space-y-4">
-        
-        <div class="flex flex-wrap items-center gap-2">
-        
-          <span
-            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
-          >
-            Post by {{ news.reporter.firstname }} {{ news.reporter.lastname }}
+  class="w-full max-w-6xl xl:max-w-7xl rounded-2xl backdrop-blur shadow-xl border border-white"
+>
+  <div class="p-6 md:p-8 space-y-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <span
+        class="inline-flex items-center rounded bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
+      >
+        Post by {{ news.reporter.firstname }} {{ news.reporter.lastname }}
+      </span>
+
+      <span
+        class="inline-flex items-center rounded bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
+      >
+        Post on {{ news.created_at }}
+      </span>
+
+      <div class="ml-auto flex items-center gap-2 text-[12px] font-medium">
+        <div
+          class="inline-flex items-center gap-1 px-2 py-1 rounded uppercase bg-green-600 text-white"
+        >
+          <span class="tracking-wide font-bold text-[18px]">
+            NOT FAKE
           </span>
-          <span
-            class="inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
-          >
-            Post on {{ news.created_at }}
+          <span class="text-[18px] font-semibold">
+            {{ news.notFakeCount }}
           </span>
-          
-          <div class="ml-auto flex items-center gap-2 text-[12px] font-medium">
-  <div
-    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-white text-green-600"
-  >
-    <span class="uppercase tracking-wide font-bold text-[18px]">
-      NOT FAKE
-    </span>
-    <span class="text-[18px] font-semibold">
-      {{ news.notFakeCount }}
-    </span>
-  </div>
-
-  <div
-    class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-white text-red-600"
-  >
-    <span class="uppercase tracking-wide font-bold text-[18px]">
-      FAKE
-    </span>
-    <span class="text-[18px] font-semibold">
-      {{ news.fakeCount }}
-    </span>
-  </div>
-</div>
-
-
         </div>
-        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
-          {{ news.topic }}
-        </h1>
-      </div>
 
-      <div class="px-6 md:px-8 mb-6">
-        <img
-          v-if="news.image && news.image.length > 0"
-          :src="news.image[0]"
-          alt="News Image"
-          class="w-full h-auto rounded-lg shadow"
-        />
-      </div>
-      <div class="px-6 md:px-8 mb-6">
-        <h1 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
-          {{ news.shortDetail }}
-        </h1>
-      </div>
-
-      <div class="px-6 md:px-8 pb-8">
-        <p class="text-gray-800 leading-relaxed">
-          {{ news.detail }}
-        </p>
+        <div
+          class="inline-flex items-center gap-1 px-2 py-1 rounded uppercase bg-red-600 text-white"
+        >
+          <span class="tracking-wide font-bold text-[18px]">
+            FAKE
+          </span>
+          <span class="text-[18px] font-semibold">
+            {{ news.fakeCount }}
+          </span>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- การ์ดข่าว -->
+  <div
+    class="bg-white rounded-lg border border-gray-200 shadow p-6 md:p-8 mb-6 mx-6 md:mx-8"
+  >
+    <!-- หัวข้อข่าว -->
+    <div class="mb-6">
+      <h1
+        class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900"
+      >
+        {{ news.topic }}
+      </h1>
+    </div>
+
+    <!-- รูปข่าว -->
+    <div class="mb-6">
+      <img
+        v-if="news.image && news.image.length > 0"
+        :src="news.image[0]"
+        alt="News Image"
+        class="w-full h-auto rounded-lg shadow"
+      />
+    </div>
+
+    <!-- Short detail -->
+    <div class="mb-6">
+      <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
+        {{ news.shortDetail }}
+      </h2>
+    </div>
+
+    <!-- Detail -->
+    <div class="pb-4">
+      <p class="text-gray-800 leading-relaxed whitespace-pre-line">
+        {{ news.detail }}
+      </p>
+    </div>
+  </div>
+</div>
 
 
       <div class="ml-8 w-full max-w-sm">

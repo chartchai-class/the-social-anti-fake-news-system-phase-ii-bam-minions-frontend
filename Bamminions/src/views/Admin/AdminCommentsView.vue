@@ -40,26 +40,32 @@ onMounted(load)
   <section class="max-w-3xl mx-auto backdrop-blur shadow-xl rounded-xl p-4">
     <!-- Header: title + total pill -->
     <div class="mb-4 flex items-center justify-end">
-      <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700">
+      <span class="text-[11px] px-2 py-0.5 rounded-sm bg-gray-50 text-gray-700">
         Total : {{ total }}
       </span>
     </div>
 
-    <div class="mb-3 flex items-center justify-between">
-      <h1 class="text-lg font-semibold text-gray-900">
-        Comments <span class="text-gray-500">(news #{{ props.newsId }}) </span>
-        <span> </span>
+    <div class="mb-3 grid grid-cols-[1fr_auto_1fr] items-center w-full p-2">
+      <!-- Left: title -->
+      <h1 class="text-lg font-semibold text-gray-900 text-left">
+        Comments of <span class="text-gray-500">(news #{{ props.newsId }})</span>
       </h1>
 
-      <!-- RED cancel on the right -->
-      <router-link :to="{ name: 'admin-news', query: { filter: 'active', page: 1, pageSize: 10 } }">
+      <!-- Center: cancel button -->
+      <router-link
+        :to="{ name: 'admin-news', query: { filter: 'active', page: 1, pageSize: 10 } }"
+        class="justify-self-center"
+      >
         <button
-          class="px-3 py-1 rounded border text-sm bg-red-600 text-white border-red-600 hover:bg-red-700"
+          class="px-3 py-1 rounded border text-sm bg-red-600 text-white border-red-600 hover:bg-red-700 active:bg-red-800 active:scale-95 transition"
           aria-label="Cancel and go back to News"
         >
           Cancel
         </button>
       </router-link>
+
+      <!-- Right: empty spacer to keep the button centered -->
+      <div></div>
     </div>
 
     <!-- Loading -->
@@ -73,17 +79,35 @@ onMounted(load)
     <!-- List (simple white cards with border, like user view) -->
     <div v-else class="space-y-3">
       <article v-for="c in items" :key="c.id" class="p-3 rounded bg-white flex items-start gap-3">
-        <div class="flex-1 min-w-0">
-          <div class="text-sm">
-            <span class="font-semibold">{{ c.usercomment?.username || 'unknown' }}</span>
-            <span class="text-gray-500"> • {{ c.created_at }}</span>
+        <div class="flex-1 min-w-0 flex flex-col">
+          <!-- header: name • date -->
+          <div class="flex items-center gap-2 text-sm">
+            <span class="font-semibold truncate">
+              {{ c.usercomment?.username || 'unknown' }}
+            </span>
+            <span class="text-gray-400">•</span>
+            <span class="text-gray-500 whitespace-nowrap">
+              {{ c.created_at }}
+            </span>
           </div>
-          <p class="text-sm mt-1 break-words">{{ c.content }}</p>
-          <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-            voteLabel={{ c.voteLabel || '—' }}
+
+          <!-- content -->
+          <p class="mt-1 text-sm text-gray-900 break-words whitespace-pre-line">
+            {{ c.content }}
+          </p>
+
+          <!-- meta -->
+          <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+            <span
+              class="inline-flex items-center rounded-full px-2 py-0.5 ring-1 ring-gray-200 bg-gray-50 text-gray-700"
+            >
+              voteLabel:
+              <span class="ml-1 font-medium text-gray-800">{{ c.voteLabel || '—' }}</span>
+            </span>
+
             <span
               v-if="c.removed"
-              class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 text-red-700"
+              class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 text-red-700 ring-1 ring-red-200"
             >
               REMOVED
             </span>

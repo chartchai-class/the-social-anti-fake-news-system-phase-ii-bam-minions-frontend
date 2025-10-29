@@ -24,6 +24,9 @@ export const useAuthStore = defineStore('auth', {
     currentUserName(): string {
       return this.user?.firstname || ''
     },
+    currentUserLastname(): string {
+      return this.user?.lastname || ''
+    },
     currentUserImage(): string[]{
       return this.user?.image || []
     },
@@ -32,7 +35,7 @@ export const useAuthStore = defineStore('auth', {
       return `Bearer ${this.token}`
     },
 
-      isAdmin(): boolean { 
+      isAdmin(): boolean {
      return this.user?.roles.includes('ROLE_ADMIN') || false
     },
     isMember(): boolean {

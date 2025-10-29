@@ -35,7 +35,7 @@ const roleBadge = computed(() => {
     return {
       text: 'Saving…',
       ring: 'ring-blue-200',
-      tone: 'bg-blue-50 text-blue-700',
+      tone: 'text-blue-700',
       icon: 'spinner' as const,
     }
   }
@@ -43,7 +43,7 @@ const roleBadge = computed(() => {
     return {
       text: 'Failed',
       ring: 'ring-red-200',
-      tone: 'bg-red-50 text-red-700',
+      tone: 'ext-red-700',
       icon: 'alert' as const,
     }
   }
@@ -51,20 +51,20 @@ const roleBadge = computed(() => {
     return {
       text: 'Member',
       ring: 'ring-purple-200',
-      tone: 'bg-purple-50 text-purple-700',
+      tone: 'ext-purple-700',
     }
   }
   if (currentRole.value === 'ROLE_READER') {
     return {
       text: 'Reader',
       ring: 'ring-amber-200',
-      tone: 'bg-amber-50 text-amber-700',
+      tone: 'text-amber-700',
     }
   }
   return {
     text: 'No role',
     ring: 'ring-gray-200',
-    tone: 'bg-gray-50 text-gray-700',
+    tone: 'text-gray-700',
   }
 })
 
@@ -117,7 +117,7 @@ function setRoleImmediate(role: Role) {
         <!-- Simple Tailwind role/status pill -->
         <div class="ml-auto">
           <span
-            class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold ring-1"
+            class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold"
             :class="[roleBadge.tone, roleBadge.ring]"
             aria-live="polite"
           >

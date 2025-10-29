@@ -187,7 +187,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex justify-center px-4 py-8">
+  <div class="flex flex-col lg:flex-row justify-center px-2 sm:px-4 py-8 gap-8 lg:gap-6">
     <!-- ===== Modal confirm delete comment ===== -->
     <div
       v-if="auth.isAdmin === true && showConfirm"
@@ -228,10 +228,12 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- main article — wider frame on large screens -->
     <div
-      class="w-full max-w-6xl xl:max-w-7xl rounded-2xl backdrop-blur shadow-xl border border-white"
+      class="w-full lg:w-[86%] xl:w-[88%] <!-- ขยายความกว้างในจอใหญ่ --> max-w-[1400px] <!-- เพดานกว้างสุด --> rounded-2xl backdrop-blur shadow-xl border border-white p-0 sm:p-3"
     >
-      <div class="p-6 md:p-8 space-y-4">
+      <!-- header/top badges -->
+      <div class="px-2 sm:px-4 pt-4 sm:pt-6 md:pt-8 pb-3 space-y-4">
         <div class="flex flex-wrap items-center gap-2">
           <span
             class="inline-flex items-center rounded bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
@@ -245,38 +247,38 @@ onMounted(() => {
             Post on {{ news.created_at }}
           </span>
 
-          <div class="ml-auto flex items-center gap-2 text-[12px] font-medium">
+          <div
+            class="w-full sm:w-auto sm:ml-auto flex flex-wrap sm:flex-nowrap items-center gap-2 text-[12px] font-medium"
+          >
             <div
               class="inline-flex items-center gap-1 px-2 py-1 rounded uppercase bg-green-600 text-white"
             >
-              <span class="tracking-wide font-bold text-[18px]"> NOT FAKE </span>
-              <span class="text-[18px] font-semibold">
-                {{ news.notFakeCount }}
-              </span>
+              <span class="tracking-wide font-bold text-[18px]">NOT FAKE</span>
+              <span class="text-[18px] font-semibold">{{ news.notFakeCount }}</span>
             </div>
 
             <div
               class="inline-flex items-center gap-1 px-2 py-1 rounded uppercase bg-red-600 text-white"
             >
-              <span class="tracking-wide font-bold text-[18px]"> FAKE </span>
-              <span class="text-[18px] font-semibold">
-                {{ news.fakeCount }}
-              </span>
+              <span class="tracking-wide font-bold text-[18px]">FAKE</span>
+              <span class="text-[18px] font-semibold">{{ news.fakeCount }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- การ์ดข่าว -->
-      <div class="bg-white rounded-lg border border-gray-200 shadow p-6 md:p-8 mb-6 mx-6 md:mx-8">
-        <!-- หัวข้อข่าว -->
+      <!-- news card — flush to frame on mobile -->
+      <div
+        class="bg-white rounded-lg border border-gray-200 shadow p-6 md:p-8 mb-6 mx-0 sm:mx-2 md:mx-4 xl:mx-6"
+      >
+        <!-- title -->
         <div class="mb-6">
           <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
             {{ news.topic }}
           </h1>
         </div>
 
-        <!-- รูปข่าว -->
+        <!-- image -->
         <div class="mb-6" v-if="news.image && news.image.length > 0">
           <div class="w-full flex items-center justify-center overflow-hidden">
             <img
@@ -287,14 +289,14 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Short detail -->
+        <!-- short detail -->
         <div class="mb-6">
           <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
             {{ news.shortDetail }}
           </h2>
         </div>
 
-        <!-- Detail -->
+        <!-- detail -->
         <div class="pb-4">
           <p class="text-gray-800 leading-relaxed whitespace-pre-line">
             {{ news.detail }}
@@ -303,7 +305,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="ml-8 w-full max-w-sm">
+    <!-- comments sidebar — slightly narrower so article gains space -->
+    <div class="w-full lg:w-[260px] xl:w-[280px] lg:ml-4 xl:ml-6 max-w-sm">
       <h2 class="text-base md:text-lg font-bold tracking-tight text-white text-center py-2">
         Comments
       </h2>
@@ -320,12 +323,14 @@ onMounted(() => {
       </div>
 
       <div class="mt-6">
-        <div class="flex justify-center text-sm font-medium text-gray-200">
+        <div class="flex justify-center text-sm font-medium text-gray-200 text-center flex-wrap">
           Page {{ currentPage }} of {{ totalPages }}
           <span v-if="totalComments">&nbsp;•&nbsp;{{ totalComments }} comments total</span>
         </div>
 
-        <div class="flex justify-center items-center mt-8 space-x-2 select-none text-xs">
+        <div
+          class="flex flex-col sm:flex-row justify-center items-center mt-8 sm:space-x-2 space-y-4 sm:space-y-0 select-none text-xs"
+        >
           <!-- Prev -->
           <router-link
             v-if="hasPrev"
@@ -344,7 +349,7 @@ onMounted(() => {
           </router-link>
 
           <!-- page numbers -->
-          <div class="flex space-x-2 mx-2">
+          <div class="flex flex-wrap justify-center space-x-2 mx-2">
             <router-link
               v-for="num in pages"
               :key="num"

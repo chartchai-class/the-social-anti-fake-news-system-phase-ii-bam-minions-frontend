@@ -2,7 +2,7 @@
 import NewsCard from '@/components/NewsCard.vue'
 import NewsService from '@/services/NewsService'
 import type { News } from '@/types'
-import { ref, onMounted, computed, watchEffect } from 'vue'
+import { ref, onMounted, computed, watchEffect, onBeforeUnmount } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 const auth = useAuthStore()
 
@@ -89,8 +89,27 @@ function confirmDelete() {
 }
 
 const isPageSizeMenuOpen = ref(false)
-
+const filtersRef = ref<HTMLElement | null>(null)
 const isStatusMenuOpen = ref(false)
+
+function toggleStatusMenu() {
+  isStatusMenuOpen.value = !isStatusMenuOpen.value
+  if (isStatusMenuOpen.value) isPageSizeMenuOpen.value = false
+}
+
+function togglePageSizeMenu() {
+  isPageSizeMenuOpen.value = !isPageSizeMenuOpen.value
+  if (isPageSizeMenuOpen.value) isStatusMenuOpen.value = false
+}
+
+function onClickOutside(e: MouseEvent) {
+  const el = filtersRef.value
+  if (!el) return
+  if (!el.contains(e.target as Node)) {
+    isStatusMenuOpen.value = false
+    isPageSizeMenuOpen.value = false
+  }
+}
 
 function selectStatus(value: string) {
   statusFilter.value = value
@@ -158,6 +177,14 @@ function onDeleteNews(id: number) {
 }
 
 onMounted(() => {
+  document.addEventListener('click', onClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onClickOutside)
+})
+
+onMounted(() => {
   watchEffect(() => {
     loadEvents()
   })
@@ -218,16 +245,15 @@ onMounted(() => {
 
   <div class="pt-8 pb-16 min-h-screen">
     <div class="container mx-auto px-4 sm:px-6 md:px-50">
-      <!-- Filter Row -->
-      <div
-        class="mb-4 flex flex-col gap-4 sm:gap-2 sm:flex-row sm:flex-wrap sm:items-start justify-start"
-      >
-        <!-- Status Filter -->
-        <div class="relative inline-block text-left w-full sm:w-auto">
+      <!-- Filters row -->
+      <div ref="filtersRef" class="mb-4 flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-3">
+        <!-- STATUS FILTER -->
+        <div class="relative w-full sm:w-64 text-left">
           <button
             type="button"
-            class="inline-flex w-full sm:min-w-[140px] sm:w-auto items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50"
-            @click="isStatusMenuOpen = !isStatusMenuOpen"
+            class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            :aria-expanded="isStatusMenuOpen"
+            @click.stop="toggleStatusMenu"
           >
             <span>
               <span v-if="statusFilter === ''">ALL</span>
@@ -237,12 +263,7 @@ onMounted(() => {
               <span v-else-if="statusFilter === 'UNVERIFIED'">UNVERIFIED</span>
               <span v-else>{{ statusFilter }}</span>
             </span>
-
-            <svg
-              class="h-4 w-4 text-gray-500 flex-shrink-0"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
@@ -251,77 +272,66 @@ onMounted(() => {
             </svg>
           </button>
 
+          <!-- dropdown: full on mobile, same fixed width on sm+ -->
           <div
             v-if="isStatusMenuOpen"
-            class="absolute z-40 mt-2 w-40 origin-top-left rounded-md border shadow-lg ring-1 ring-black/5 focus:outline-none"
+            class="absolute left-0 z-40 mt-2 w-full sm:w-64 rounded-md border bg-white shadow-lg ring-1 ring-black/5"
           >
             <ul class="py-1 text-sm text-gray-700">
               <li>
                 <button
-                  class="font-bold flex w-full items-center justify-between px-3 py-2 text-black bg-white hover:bg-gray-100 text-left"
-                  @click="selectStatus('')"
+                  class="w-full text-left px-3 py-2 hover:bg-gray-100 font-semibold"
+                  @click.stop="selectStatus('')"
                 >
-                  <span>ALL</span>
+                  ALL
                 </button>
               </li>
-
               <li>
                 <button
-                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-red-600 hover:bg-red-500 text-left text-white"
-                  @click="selectStatus('FAKE')"
+                  class="w-full text-left px-3 py-2 bg-red-600/90 hover:bg-red-600 text-white font-semibold"
+                  @click.stop="selectStatus('FAKE')"
                 >
-                  <span>FAKE</span>
+                  FAKE
                 </button>
               </li>
-
               <li>
                 <button
-                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-green-600 hover:bg-green-500 text-left text-white"
-                  @click="selectStatus('NOT_FAKE')"
+                  class="w-full text-left px-3 py-2 bg-green-600/90 hover:bg-green-600 text-white font-semibold"
+                  @click.stop="selectStatus('NOT_FAKE')"
                 >
-                  <span>NOT FAKE</span>
+                  NOT FAKE
                 </button>
               </li>
-
               <li>
                 <button
-                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-left text-black"
-                  @click="selectStatus('TIE')"
+                  class="w-full text-left px-3 py-2 bg-yellow-500/90 hover:bg-yellow-500 text-black font-semibold"
+                  @click.stop="selectStatus('TIE')"
                 >
-                  <span>TIE</span>
+                  TIE
                 </button>
               </li>
-
               <li>
                 <button
-                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-gray-400 hover:bg-gray-300 text-left text-black"
-                  @click="selectStatus('UNVERIFIED')"
+                  class="w-full text-left px-3 py-2 bg-gray-400/90 hover:bg-gray-400 text-black font-semibold"
+                  @click.stop="selectStatus('UNVERIFIED')"
                 >
-                  <span>UNVERIFIED</span>
-                  <span
-                    v-if="statusFilter === 'UNVERIFIED'"
-                    class="h-2 w-2 rounded-full bg-gray-400"
-                  ></span>
+                  UNVERIFIED
                 </button>
               </li>
             </ul>
           </div>
         </div>
 
-        <!-- Page Size -->
-        <div class="relative inline-block text-left ml-0 sm:ml-5 w-full sm:w-auto">
+        <!-- PER PAGE (exact same width as Filter) -->
+        <div class="relative w-full sm:w-64 text-left">
           <button
             type="button"
-            class="inline-flex w-full sm:min-w-[160px] sm:w-auto items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
-            @click="isPageSizeMenuOpen = !isPageSizeMenuOpen"
+            class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            :aria-expanded="isPageSizeMenuOpen"
+            @click.stop="togglePageSizeMenu"
           >
             <span>{{ pageSize }} per page</span>
-
-            <svg
-              class="h-4 w-4 text-gray-500 flex-shrink-0"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
@@ -332,30 +342,31 @@ onMounted(() => {
 
           <div
             v-if="isPageSizeMenuOpen"
-            class="font-semibold absolute z-50 mt-2 w-44 origin-top-left rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+            class="absolute left-0 z-50 mt-2 w-full sm:w-64 rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5"
           >
-            <ul class="font-semibold py-1 text-sm text-gray-700 max-h-60 overflow-auto">
+            <ul class="py-1 text-sm text-gray-700 max-h-60 overflow-auto">
               <li v-for="size in pageSizeOption" :key="size">
                 <router-link
                   :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
-                  class="font-semibold flex w-full items-center justify-between px-3 py-2 hover:bg-gray-100 text-left"
-                  @click="isPageSizeMenuOpen = false"
+                  class="flex w-full items-center justify-between px-3 py-2 hover:bg-gray-100 text-left"
+                  @click.stop="isPageSizeMenuOpen = false"
                 >
                   <span>{{ size }} per page</span>
+                  <span v-if="pageSize === size" class="h-2 w-2 rounded-full bg-black"></span>
                 </router-link>
               </li>
             </ul>
           </div>
         </div>
 
-        <!-- Search -->
-        <div class="inline-block ml-0 sm:ml-2 w-full sm:w-auto">
+        <!-- SEARCH (เดิม) -->
+        <div class="inline-block w-full sm:w-64">
           <input
             v-model="keyword"
             type="text"
             placeholder="Search..."
             @input="loadEvents"
-            class="border border-white bg-white text-black rounded px-3 py-2 text-sm w-full sm:w-64 focus:outline-none"
+            class="border border-white bg-white text-black rounded px-3 py-2 text-sm w-full focus:outline-none"
           />
         </div>
       </div>

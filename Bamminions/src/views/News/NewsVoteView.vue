@@ -60,7 +60,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="mt-13 p-4 sm:p-5 rounded-2xl backdrop-blur border border-white space-y-4 max-w-xl center mx-auto"
+    class="mt-13 p-4 sm:p-6 rounded-2xl backdrop-blur border border-white/80 bg-black/20 space-y-4 max-w-xl w-full mx-auto overflow-hidden"
   >
     <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white text-center">
       Vote on this News
@@ -71,7 +71,7 @@ onMounted(() => {
         v-if="news.image && news.image.length > 0"
         :src="news.image[0]"
         alt="News Image"
-        class="w-full h-auto rounded-lg shadow"
+        class="w-full h-auto rounded-lg"
       />
     </div>
 
@@ -82,13 +82,11 @@ onMounted(() => {
     >
       <button
         type="button"
-        class="w-1/2 px-3 py-2 text-sm font-medium transition rounded-md"
+        class="w-1/2 px-3 py-2 text-sm font-medium transition"
         :class="[
           label === 'NOT_FAKE'
-            ? // selected: solid green + glow on hover
-              'bg-emerald-600 text-white'
-            : // unselected: light hover tint + green glow
-              'text-gray-700 dark:text-gray-200 hover:bg-emerald-50 hover:text-emerald-700',
+            ? 'bg-emerald-600 text-white'
+            : 'text-gray-700 dark:text-gray-200 hover:bg-emerald-50 hover:text-emerald-700',
         ]"
         @click="choose('NOT_FAKE')"
       >
@@ -97,13 +95,11 @@ onMounted(() => {
 
       <button
         type="button"
-        class="w-1/2 px-3 py-2 text-sm font-medium transition rounded-md"
+        class="w-1/2 px-3 py-2 text-sm font-medium transition"
         :class="[
           label === 'FAKE'
-            ? // selected: solid red + glow on hover
-              'bg-red-600 text-white '
-            : // unselected: light hover tint + red glow
-              'text-gray-700 dark:text-gray-200 hover:bg-red-50 hover:text-red-700 ',
+            ? 'bg-red-600 text-white'
+            : 'text-gray-700 dark:text-gray-200 hover:bg-red-50 hover:text-red-700',
         ]"
         @click="choose('FAKE')"
       >
@@ -138,10 +134,12 @@ onMounted(() => {
         {{ errors.image }}
       </p>
     </div>
-    <div class="flex justify-center gap-3 mt-6">
+
+    <!-- Buttons side-by-side on all screen sizes -->
+    <div class="grid grid-cols-2 gap-3 mt-6 pb-1">
       <button
         type="button"
-        class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-indigo-600 transition"
+        class="w-full px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition"
         :disabled="!label"
         @click="submit"
       >
@@ -150,7 +148,7 @@ onMounted(() => {
 
       <router-link
         :to="{ name: 'news-detail-view', params: { id: props.news.id } }"
-        class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-red-600 text-white text-center shadow-lg hover:bg-red-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 active:scale-[0.99] transition"
+        class="w-full px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-red-600 text-white text-center hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 active:scale-[0.99] transition"
       >
         Cancel
       </router-link>

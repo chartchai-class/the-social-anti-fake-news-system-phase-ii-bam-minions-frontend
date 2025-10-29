@@ -32,9 +32,6 @@ function goFilter(nextFilter: string) {
     query: { filter: nextFilter, page: 1, pageSize: pageSize.value },
   })
 }
-function openComments(newsId: number) {
-  router.push({ name: 'admin-news-comments', params: { newsId }, query: { page: 1, pageSize: 10 } })
-}
 
 watch(() => [page.value, pageSize.value, filter.value], load, { immediate: true })
 onMounted(load)
@@ -97,38 +94,47 @@ onMounted(load)
       </div>
     </div>
 
-    <!-- List -->
     <div v-else class="space-y-3">
-      <div v-for="n in items" :key="n.id" class="p-3 rounded bg-white flex items-center gap-3">
-        <img
-          v-if="n.image?.length"
-          :src="n.image[0]"
-          alt=""
-          class="w-20 h-14 object-cover rounded"
-        />
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2">
-            <h3 class="font-semibold text-gray-900 truncate">{{ n.topic }}</h3>
-            <span
-              v-if="n.removed"
-              class="text-[11px] px-2 py-0.5 rounded-full border bg-red-50 text-red-700"
-              >REMOVED</span
-            >
-          </div>
-          <p class="text-xs text-gray-500 truncate">
-            {{ n.created_at }} • fake={{ n.fakeCount }} • notFake={{ n.notFakeCount }} • status={{
-              n.status
-            }}
-          </p>
-        </div>
+      <router-link
+        v-for="n in items"
+        :key="n.id"
+        :to="{
+          name: 'admin-news-comments',
+          params: { newsId: n.id },
+          query: { page: 1, pageSize: 10 },
+        }"
+        class="group block rounded bg-white ring-1 ring-gray-200 transition hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <div class="p-3 flex items-center gap-3 cursor-pointer">
+          <img
+            v-if="n.image?.length"
+            :src="n.image[0]"
+            alt=""
+            class="w-20 h-14 object-cover rounded"
+          />
 
-        <button
-          class="ml-auto px-3 py-1 rounded text-white text-sm bg-green-600 hover:bg-green-500"
-          @click="openComments(n.id)"
-        >
-          Comments
-        </button>
-      </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <h3 class="font-semibold text-gray-900 truncate">{{ n.topic }}</h3>
+              <span
+                v-if="n.removed"
+                class="text-[11px] px-2 py-0.5 rounded-full border bg-red-50 text-red-700"
+                >REMOVED</span
+              >
+            </div>
+            <p class="text-xs text-gray-500 truncate">
+              {{ n.created_at }} • fake={{ n.fakeCount }} • notFake={{ n.notFakeCount }} • status={{
+                n.status
+              }}
+            </p>
+          </div>
+
+          <!-- subtle hint on desktop -->
+          <span class="hidden md:inline text-xs text-gray-500 group-hover:text-gray-700"
+            >Comments ›</span
+          >
+        </div>
+      </router-link>
     </div>
 
     <!-- Pagination -->

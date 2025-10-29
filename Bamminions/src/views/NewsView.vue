@@ -211,17 +211,22 @@ onMounted(() => {
     <span class="hidden sm:inline">Add News</span>
   </router-link>
 
-  <div class="w-64 justify-center mx-auto mb-6">
+  <!-- Search bar -->
+  <div class="w-full max-w-xs sm:w-64 justify-center mx-auto mb-6">
     <BaseInput v-model="keyword" label="Search..." @input="loadEvents" class="w-full" />
   </div>
 
   <div class="pt-8 pb-16 min-h-screen">
-    <div class="container mx-auto px-4 md:px-50">
-      <div class="mb-4 flex justify-start">
-        <div class="relative inline-block text-left">
+    <div class="container mx-auto px-4 sm:px-6 md:px-50">
+      <!-- Filter Row -->
+      <div
+        class="mb-4 flex flex-col gap-4 sm:gap-2 sm:flex-row sm:flex-wrap sm:items-start justify-start"
+      >
+        <!-- Status Filter -->
+        <div class="relative inline-block text-left w-full sm:w-auto">
           <button
             type="button"
-            class="inline-flex min-w-[140px] items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50"
+            class="inline-flex w-full sm:min-w-[140px] sm:w-auto items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50"
             @click="isStatusMenuOpen = !isStatusMenuOpen"
           >
             <span>
@@ -232,6 +237,18 @@ onMounted(() => {
               <span v-else-if="statusFilter === 'UNVERIFIED'">UNVERIFIED</span>
               <span v-else>{{ statusFilter }}</span>
             </span>
+
+            <svg
+              class="h-4 w-4 text-gray-500 flex-shrink-0"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                clip-rule="evenodd"
+              />
+            </svg>
           </button>
 
           <div
@@ -291,15 +308,20 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="relative inline-block text-left ml-5">
+        <!-- Page Size -->
+        <div class="relative inline-block text-left ml-0 sm:ml-5 w-full sm:w-auto">
           <button
             type="button"
-            class="inline-flex min-w-[160px] items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            class="inline-flex w-full sm:min-w-[160px] sm:w-auto items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
             @click="isPageSizeMenuOpen = !isPageSizeMenuOpen"
           >
             <span>{{ pageSize }} per page</span>
 
-            <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+            <svg
+              class="h-4 w-4 text-gray-500 flex-shrink-0"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
               <path
                 fill-rule="evenodd"
                 d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
@@ -325,13 +347,15 @@ onMounted(() => {
             </ul>
           </div>
         </div>
-        <div class="inline-block ml-2">
+
+        <!-- Search -->
+        <div class="inline-block ml-0 sm:ml-2 w-full sm:w-auto">
           <input
             v-model="keyword"
             type="text"
             placeholder="Search..."
             @input="loadEvents"
-            class="border border-white bg-white text-black rounded px-3 py-2 text-sm w-64 focus:outline-none"
+            class="border border-white bg-white text-black rounded px-3 py-2 text-sm w-full sm:w-64 focus:outline-none"
           />
         </div>
       </div>
@@ -365,7 +389,28 @@ onMounted(() => {
         <span v-if="totalNews"> </span>
       </div>
 
-      <div class="flex justify-center items-center mt-8 space-x-2 select-none">
+      <!-- row: page numbers -->
+      <div class="flex flex-wrap justify-center space-x-2 mt-4 select-none">
+        <router-link
+          v-for="num in pages"
+          :key="num"
+          :to="{ name: 'news-view', query: { page: num, pageSize: pageSize } }"
+        >
+          <button
+            class="w-9 h-9 flex items-center justify-center border transition"
+            :class="[
+              num === page
+                ? ' text-black bg-white font-bold'
+                : ' text-gray-700 bg-gray-100 hover:bg-gray-400',
+            ]"
+          >
+            {{ num }}
+          </button>
+        </router-link>
+      </div>
+
+      <!-- row: prev / next -->
+      <div class="flex justify-center items-center mt-4 space-x-2 select-none">
         <router-link
           v-if="hasPrev"
           :to="{ name: 'news-view', query: { page: page - 1, pageSize: pageSize } }"
@@ -378,32 +423,13 @@ onMounted(() => {
           </button>
         </router-link>
 
-        <div class="flex space-x-2 mx-2">
-          <router-link
-            v-for="num in pages"
-            :key="num"
-            :to="{ name: 'news-view', query: { page: num, pageSize: pageSize } }"
-          >
-            <button
-              class="w-9 h-9 flex items-center justify-center border transition"
-              :class="[
-                num === page
-                  ? ' text-black bg-white font-bold'
-                  : ' text-gray-700 bg-gray-100 hover:bg-gray-400',
-              ]"
-            >
-              {{ num }}
-            </button>
-          </router-link>
-        </div>
-
         <router-link
           v-if="hasNext"
           :to="{ name: 'news-view', query: { page: page + 1, pageSize: pageSize } }"
           class="flex items-center"
         >
           <button
-            class="min-w-[90px] h-9 flex items-center justify-center border rounded text-white hover:bg-black transition"
+            class="min-w-[90px] h-9 flex items-center justify-center border rounded text-white hover:bg-gray-200 transition"
           >
             Next Page ›
           </button>

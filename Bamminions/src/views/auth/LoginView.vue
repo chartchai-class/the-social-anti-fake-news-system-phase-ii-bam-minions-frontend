@@ -3,16 +3,17 @@ import InputText from '@/components/InputText.vue'
 import * as yup from 'yup'
 import { useField, useForm } from 'vee-validate'
 import { useAuthStore } from '@/stores/auth'
-const authStore = useAuthStore()
-
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
+import bamminnionsLogo from '@/assets/BamMinionsLogo.png'
 
+const authStore = useAuthStore()
 const messageStore = useMessageStore()
 const router = useRouter()
+
 const validationSchema = yup.object({
-  email: yup.string().required('The email is required'),
-  password: yup.string().required('The password is required'),
+  email: yup.string().required('Email is required'),
+  password: yup.string().required('Password is required'),
 })
 
 const { errors, handleSubmit } = useForm({
@@ -25,92 +26,81 @@ const { errors, handleSubmit } = useForm({
 
 const { value: email } = useField<string>('email')
 const { value: password } = useField<string>('password')
+
 const onSubmit = handleSubmit((values) => {
   authStore
     .login(values.email, values.password)
     .then(() => {
-      console.log('Login successful')
       router.push({ name: 'news-view' })
     })
-    .catch((err) => {
-      messageStore.updateMessage('could not login')
+    .catch(() => {
+      messageStore.updateMessage('Could not log in')
       setTimeout(() => {
         messageStore.resetMessage()
       }, 3000)
-      console.log('error', err)
     })
 })
 </script>
 
 <template>
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <!-- https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600 -->
-      <img
-        class="mx-auto h-10 w-auto"
-        src="https://preview.redd.it/random-question-but-does-anyone-have-versions-of-this-cat-v0-ya8qikz9kn0f1.png?width=640&crop=smart&auto=webp&s=2487b53aa5d4ac4e710f7717a6850c83562272ab"
-        alt="Your Company"
-      />
-      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-        Sign in to your account
-      </h2>
+  <div class="space-y-6">
+    <!-- Header block -->
+    <div class="text-center space-y-3">
+      <div class="flex flex-col items-center">
+        <!-- Logo badge -->
+        <img :src="bamminnionsLogo" alt="Brand Logo" class="w-20 h-20 object-contain" />
+        <!-- Headline -->
+        <h2 class="mt-4 text-lg font-extrabold text-gray-900">Welcome Bam Minions News</h2>
+        <div>
+          <p class="text-sm text-gray-500">Please log in to your account</p>
+        </div>
+      </div>
     </div>
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form class="space-y-6" @submit.prevent="onSubmit">
-        <!-- Email -->
-        <div>
-          <label for="email" class="block text-sm font-medium leading-6 text-gray-900">
-            Email address
-          </label>
-          <InputText
-            type="text"
-            id="email"
-            v-model="email"
-            placeholder="Email address"
-            :error="errors['email']"
-          />
+    <!-- Form -->
+    <form class="space-y-5" @submit.prevent="onSubmit">
+      <!-- Email -->
+      <div class="flex flex-col gap-1">
+        <label for="email" class="text-sm font-medium text-gray-900"> Email </label>
+        <InputText
+          type="text"
+          id="email"
+          v-model="email"
+          placeholder="Email address"
+          :error="errors['email']"
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center justify-between">
+          <label for="password" class="text-sm font-medium text-gray-900"> Password </label>
         </div>
 
-        <!-- Password -->
-        <div>
-          <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm font-medium leading-6 text-gray-900">
-              Password
-            </label>
-            <div class="text-sm">
-              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">
-                Forgot password?
-              </a>
-            </div>
-          </div>
-          <InputText
-            type="password"
-            id="password"
-            v-model="password"
-            placeholder="Password"
-            :error="errors['password']"
-          />
-        </div>
+        <InputText
+          type="password"
+          id="password"
+          v-model="password"
+          placeholder="Password"
+          :error="errors['password']"
+        />
+      </div>
 
-        <!-- Submit Button -->
-        <div>
-          <button
-            type="submit"
-            class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Sign in
-          </button>
-        </div>
-      </form>
+      <!-- Button -->
+      <button
+        type="submit"
+        class="w-full inline-flex justify-center rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+      >
+        Sign In
+      </button>
 
-      <!-- Register link -->
-      <p class="mt-10 text-center text-sm text-gray-500">
-        Not a member?
-        <a href="#" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-          Try to register here
-        </a>
+      <!-- helper text -->
+      <p class="text-center text-xs text-gray-500">
+        New here?
+        <RouterLink :to="{ name: 'register' }" class="font-semibold text-black hover:text-gray-700">
+          Create an account
+        </RouterLink>
       </p>
-    </div>
+    </form>
   </div>
 </template>

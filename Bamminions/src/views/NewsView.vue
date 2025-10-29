@@ -27,7 +27,8 @@ const page = computed(() => props.page)
 const pageSize = computed(() => props.pageSize)
 
 const totalPages = computed(() => {
-  return Math.ceil(totalNews.value / pageSize.value)
+  const pages = Math.ceil(totalNews.value / pageSize.value)
+  return pages <= 0 ? 1 : pages
 })
 
 const hasPrev = computed(() => page.value > 1)
@@ -220,7 +221,7 @@ onMounted(() => {
         <div class="relative inline-block text-left">
           <button
             type="button"
-            class="inline-flex min-w-[140px] items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            class="inline-flex min-w-[140px] items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50"
             @click="isStatusMenuOpen = !isStatusMenuOpen"
           >
             <span>
@@ -228,6 +229,7 @@ onMounted(() => {
               <span v-else-if="statusFilter === 'FAKE'">FAKE</span>
               <span v-else-if="statusFilter === 'NOT_FAKE'">NOT FAKE</span>
               <span v-else-if="statusFilter === 'TIE'">TIE</span>
+              <span v-else-if="statusFilter === 'UNVERIFIED'">UNVERIFIED</span>
               <span v-else>{{ statusFilter }}</span>
             </span>
           </button>
@@ -239,49 +241,49 @@ onMounted(() => {
             <ul class="py-1 text-sm text-gray-700">
               <li>
                 <button
-                  class="flex w-full items-center justify-between px-3 py-2 text-black bg-gray-400 hover:bg-gray-300 text-left"
+                  class="font-bold flex w-full items-center justify-between px-3 py-2 text-black bg-white hover:bg-gray-100 text-left"
                   @click="selectStatus('')"
                 >
                   <span>ALL</span>
-                  <span v-if="statusFilter === ''" class="h-2 w-2 rounded-full bg-gray-400"></span>
                 </button>
               </li>
 
               <li>
                 <button
-                  class="flex w-full items-center justify-between px-3 py-2 bg-red-600 hover:bg-red-500 text-left text-white"
+                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-red-600 hover:bg-red-500 text-left text-white"
                   @click="selectStatus('FAKE')"
                 >
                   <span>FAKE</span>
-                  <span
-                    v-if="statusFilter === 'FAKE'"
-                    class="h-2 w-2 rounded-full bg-red-600"
-                  ></span>
                 </button>
               </li>
 
               <li>
                 <button
-                  class="flex w-full items-center justify-between px-3 py-2 bg-green-600 hover:bg-green-500 text-left text-white"
+                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-green-600 hover:bg-green-500 text-left text-white"
                   @click="selectStatus('NOT_FAKE')"
                 >
                   <span>NOT FAKE</span>
-                  <span
-                    v-if="statusFilter === 'NOT_FAKE'"
-                    class="h-2 w-2 rounded-full bg-green-600"
-                  ></span>
                 </button>
               </li>
 
               <li>
                 <button
-                  class="flex w-full items-center justify-between px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-left text-black"
+                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-left text-black"
                   @click="selectStatus('TIE')"
                 >
                   <span>TIE</span>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  class="font-bold flex w-full items-center justify-between px-3 py-2 bg-gray-400 hover:bg-gray-300 text-left text-black"
+                  @click="selectStatus('UNVERIFIED')"
+                >
+                  <span>UNVERIFIED</span>
                   <span
-                    v-if="statusFilter === 'TIE'"
-                    class="h-2 w-2 rounded-full bg-yellow-500"
+                    v-if="statusFilter === 'UNVERIFIED'"
+                    class="h-2 w-2 rounded-full bg-gray-400"
                   ></span>
                 </button>
               </li>
@@ -308,18 +310,16 @@ onMounted(() => {
 
           <div
             v-if="isPageSizeMenuOpen"
-            class="absolute z-50 mt-2 w-44 origin-top-left rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+            class="font-semibold absolute z-50 mt-2 w-44 origin-top-left rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
           >
-            <ul class="py-1 text-sm text-gray-700 max-h-60 overflow-auto">
+            <ul class="font-semibold py-1 text-sm text-gray-700 max-h-60 overflow-auto">
               <li v-for="size in pageSizeOption" :key="size">
                 <router-link
                   :to="{ name: 'news-view', query: { page: 1, pageSize: size } }"
-                  class="flex w-full items-center justify-between px-3 py-2 hover:bg-gray-100 text-left"
+                  class="font-semibold flex w-full items-center justify-between px-3 py-2 hover:bg-gray-100 text-left"
                   @click="isPageSizeMenuOpen = false"
                 >
                   <span>{{ size }} per page</span>
-
-                  <span v-if="pageSize === size" class="h-2 w-2 rounded-full bg-black"></span>
                 </router-link>
               </li>
             </ul>

@@ -12,6 +12,7 @@ import AdminDashboard from '@/views/Admin/AdminDashboard.vue'
 import AdminNewsListView from '@/views/Admin/AdminNewsListView.vue'
 import AdminCommentsView from '@/views/Admin/AdminCommentsView.vue'
 import AdminUserView from '@/views/Admin/AdminUserView.vue'
+import AuthLayout from '@/views/auth/AuthLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,7 +41,8 @@ const router = createRouter({
         return NewsService.getNew(id)
           .then((response) => {
             //setup the data for event
-            newsStore.setNews(response.data)})
+            newsStore.setNews(response.data)
+          })
           .catch((error) => {
             console.error('Error fetching news:', error)
           })
@@ -50,7 +52,7 @@ const router = createRouter({
           path: '',
           name: 'news-detail-view',
           component: NewsDetailView,
-          props: (route) =>({
+          props: (route) => ({
             page: parseInt((route.query.page as string) || '1'),
             pageSize: parseInt((route.query.pageSize as string) || '5'),
           }),
@@ -61,17 +63,23 @@ const router = createRouter({
           component: NewsVoteView,
           props: true,
         },
-      ]
-  },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
+      ],
     },
     {
-      path: '/register',
-      name: 'register',
-      component: RegisterView,
+      path: '/auth',
+      component: AuthLayout,
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: LoginView,
+        },
+        {
+          path: 'register',
+          name: 'register',
+          component: RegisterView,
+        },
+      ],
     },
     {
       path: '/add-news',
@@ -91,12 +99,11 @@ const router = createRouter({
         }
       },
     },
-   
-  {
-      path: '/admin',
-      component: AdminDashboard,     
-      children: [
 
+    {
+      path: '/admin',
+      component: AdminDashboard,
+      children: [
         {
           path: 'user',
           name: 'admin-user',

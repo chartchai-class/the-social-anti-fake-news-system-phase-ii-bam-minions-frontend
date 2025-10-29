@@ -27,7 +27,8 @@ const page = computed(() => props.page)
 const pageSize = computed(() => props.pageSize)
 
 const totalPages = computed(() => {
-  return Math.ceil(totalNews.value / pageSize.value)
+  const pages = Math.ceil(totalNews.value / pageSize.value)
+  return pages <= 0 ? 1 : pages
 })
 
 const hasPrev = computed(() => page.value > 1)
@@ -228,6 +229,7 @@ onMounted(() => {
               <span v-else-if="statusFilter === 'FAKE'">FAKE</span>
               <span v-else-if="statusFilter === 'NOT_FAKE'">NOT FAKE</span>
               <span v-else-if="statusFilter === 'TIE'">TIE</span>
+              <span v-else-if="statusFilter === 'UNVERIFIED'">UNVERIFIED</span>
               <span v-else>{{ statusFilter }}</span>
             </span>
           </button>
@@ -239,7 +241,7 @@ onMounted(() => {
             <ul class="py-1 text-sm text-gray-700">
               <li>
                 <button
-                  class="flex w-full items-center justify-between px-3 py-2 text-black bg-gray-400 hover:bg-gray-300 text-left"
+                  class="flex w-full items-center justify-between px-3 py-2 text-black bg-white hover:bg-gray-300 text-left"
                   @click="selectStatus('')"
                 >
                   <span>ALL</span>
@@ -282,6 +284,19 @@ onMounted(() => {
                   <span
                     v-if="statusFilter === 'TIE'"
                     class="h-2 w-2 rounded-full bg-yellow-500"
+                  ></span>
+                </button>
+              </li>
+
+              <li>
+                <button
+                  class="flex w-full items-center justify-between px-3 py-2 bg-gray-400 hover:bg-gray-300 text-left text-black"
+                  @click="selectStatus('UNVERIFIED')"
+                >
+                  <span>UNVERIFIED</span>
+                  <span
+                    v-if="statusFilter === 'UNVERIFIED'"
+                    class="h-2 w-2 rounded-full bg-gray-400"
                   ></span>
                 </button>
               </li>

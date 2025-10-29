@@ -31,7 +31,45 @@ const showingFrom = computed(() =>
 )
 const showingTo = computed(() => Math.min(page.value * pageSize.value, totalUsers.value))
 
-function loadUsers() {
+// Build compact page list with ellipses (optional numbered buttons)
+const pageList = computed<(number | string)[]>(() => {
+  const current = page.value
+  const total = totalPages.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  if (current <= 4) return [1, 2, 3, 4, 5, '…', total]
+  if (current >= total - 3) return [1, '…', total - 4, total - 3, total - 2, total - 1, total]
+  return [1, '…', current - 1, current, current + 1, '…', total]
+})
+
+type LoadTarget = number | 'prev' | 'next' | { pageSize: number }
+
+/** Single entry point: navigate (if target given) OR fetch (no args) */
+function loadUsers(target?: LoadTarget) {
+  // When a target is provided, compute new query, push route, and exit.
+  if (target !== undefined) {
+    let newPage = page.value
+    let newSize = pageSize.value
+
+    if (typeof target === 'number') newPage = target
+    else if (target === 'prev') newPage = page.value - 1
+    else if (target === 'next') newPage = page.value + 1
+    else if (typeof target === 'object' && 'pageSize' in target) {
+      newSize = target.pageSize
+      newPage = 1
+    }
+
+    // Clamp using known totalPages (fallback to 1 if not loaded yet)
+    const tp = totalPages.value || 1
+    newPage = Math.max(1, Math.min(tp, newPage))
+
+    // No-op if nothing changes
+    if (newPage === page.value && newSize === pageSize.value) return
+
+    router.push({ name: 'admin-user', query: { page: newPage, pageSize: newSize } })
+    return
+  }
+
+  // No target: perform the fetch for the current route state
   UserService.getUsers(pageSize.value, page.value)
     .then((res) => {
       users.value = res.data as AdminUser[]
@@ -40,46 +78,34 @@ function loadUsers() {
     .catch(() => router.push({ name: 'news-view' }))
 }
 
-// Build compact page list with ellipses
-const pageList = computed<(number | string)[]>(() => {
-  const current = page.value
-  const total = totalPages.value
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-
-  if (current <= 4) return [1, 2, 3, 4, 5, '…', total]
-  if (current >= total - 3) return [1, '…', total - 4, total - 3, total - 2, total - 1, total]
-  return [1, '…', current - 1, current, current + 1, '…', total]
-})
-
-onMounted(loadUsers)
-watch([page, pageSize], loadUsers)
-watch(() => bus.version, loadUsers)
+onMounted(() => loadUsers())
+watch([page, pageSize], () => loadUsers())
+watch(
+  () => bus.version,
+  () => loadUsers(),
+)
 </script>
 
 <template>
   <section class="max-w-3xl mx-auto p-4 backdrop-blur shadow-xl rounded-xl p-5">
-    <!-- Page size control -->
+    <!-- Page size control (uses loadUsers only) -->
     <div class="mb-3 flex">
       <span class="text-sm text-gray-900 px-8">Page size</span>
-      <!-- push the whole group to the right -->
       <div class="ml-auto flex items-center gap-3">
         <div class="flex gap-1">
-          <router-link
+          <button
             v-for="size in pageSizeOption"
             :key="size"
-            :to="{ name: 'admin-user', query: { page: 1, pageSize: size } }"
+            class="px-2.5 py-1 rounded-full border text-sm leading-none transition"
+            :class="
+              pageSize === size
+                ? 'bg-black text-white border-black'
+                : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+            "
+            @click="loadUsers({ pageSize: size })"
           >
-            <button
-              class="px-2.5 py-1 rounded-full border text-sm leading-none transition"
-              :class="
-                pageSize === size
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-              "
-            >
-              {{ size }}
-            </button>
-          </router-link>
+            {{ size }}
+          </button>
         </div>
       </div>
     </div>
@@ -90,102 +116,58 @@ watch(() => bus.version, loadUsers)
     </div>
 
     <div class="mb-2 text-xs text-gray-600 text-center p-3">
-      Showing {{ showingFrom }}–{{ showingTo }} of {{ totalUsers }}
+      Showing {{ showingFrom }} – {{ showingTo }} of {{ totalUsers }}
     </div>
 
-    <!-- Pagination -->
-    <nav class="mt-4 flex items-center justify-center gap-5" aria-label="Pagination">
-      <!-- First -->
-      <router-link :to="{ name: 'admin-user', query: { page: 1, pageSize } }" class="inline-flex">
-        <button
-          class="px-3 py-1 rounded border text-sm"
-          :class="
-            hasPrev
-              ? 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed pointer-events-none'
-          "
-          aria-label="First page"
-        >
-          «
-        </button>
-      </router-link>
-
-      <!-- Prev -->
-      <router-link
-        :to="{ name: 'admin-user', query: { page: page - 1, pageSize } }"
-        class="inline-flex"
-      >
-        <button
-          class="px-3 py-1 rounded border text-sm"
-          :class="
-            hasPrev
-              ? 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed pointer-events-none'
-          "
-          aria-label="Previous page"
-        >
-          ‹
-        </button>
-      </router-link>
-
-      <!-- Numbered pages with ellipses -->
-      <template v-for="p in pageList" :key="'p-' + p">
-        <span v-if="p === '…'" class="px-2 text-sm text-gray-500 select-none">…</span>
-        <router-link v-else :to="{ name: 'admin-user', query: { page: p as number, pageSize } }">
+    <!-- Pagination (Prev/Next + optional numbers) -->
+    <nav class="mt-4 flex items-center justify-center py-4" aria-label="Pagination">
+      <ul class="inline-flex items-center gap-3">
+        <!-- Prev -->
+        <li v-if="hasPrev">
           <button
-            class="min-w-[36px] px-2 py-1 rounded border text-sm"
+            type="button"
+            class="inline-flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
+            @click="loadUsers('prev')"
+            aria-label="Previous page"
+          >
+            <span class="-ml-0.5">‹</span>
+            <span>Prev</span>
+          </button>
+        </li>
+
+        <!-- Page numbers with ellipses (optional; keep or remove) -->
+        <li v-for="p in pageList" :key="`p-${p}-${pageSize}`">
+          <span v-if="p === '…'" class="px-2 py-1 text-xs text-gray-500 select-none">…</span>
+          <button
+            v-else
+            type="button"
+            :aria-current="p === page ? 'page' : undefined"
+            class="px-2.5 py-1 rounded border text-sm leading-none transition disabled:opacity-60"
             :class="
-              page === p
+              p === page
                 ? 'bg-black text-white border-black'
                 : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
             "
-            :aria-current="page === p ? 'page' : undefined"
+            :disabled="p === page"
+            @click="loadUsers(p as number)"
           >
             {{ p }}
           </button>
-        </router-link>
-      </template>
+        </li>
 
-      <!-- Next -->
-      <router-link
-        :to="{ name: 'admin-user', query: { page: page + 1, pageSize } }"
-        class="inline-flex"
-      >
-        <button
-          class="px-3 py-1 rounded border text-sm"
-          :class="
-            hasNext
-              ? 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed pointer-events-none'
-          "
-          aria-label="Next page"
-        >
-          ›
-        </button>
-      </router-link>
-
-      <!-- Last -->
-      <router-link
-        :to="{ name: 'admin-user', query: { page: totalPages, pageSize } }"
-        class="inline-flex"
-      >
-        <button
-          class="px-3 py-1 rounded border text-sm"
-          :class="
-            hasNext
-              ? 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
-              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed pointer-events-none'
-          "
-          aria-label="Last page"
-        >
-          »
-        </button>
-      </router-link>
+        <!-- Next -->
+        <li v-if="hasNext">
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
+            @click="loadUsers('next')"
+            aria-label="Next page"
+          >
+            <span>Next</span>
+            <span class="mr-0.5">›</span>
+          </button>
+        </li>
+      </ul>
     </nav>
-
-    <!-- Page X of Y -->
-    <div class="mt-2 text-center text-xs text-gray-600 p-2">
-      Page {{ page }} of {{ totalPages }}
-    </div>
   </section>
 </template>

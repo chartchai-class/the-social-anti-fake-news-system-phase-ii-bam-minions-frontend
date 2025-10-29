@@ -2,7 +2,15 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiAccountPlus, mdiLogin, mdiAccount, mdiLogout, mdiMenu, mdiClose } from '@mdi/js'
+import {
+  mdiAccountPlus,
+  mdiLogin,
+  mdiAccount,
+  mdiLogout,
+  mdiMenu,
+  mdiClose,
+  mdiViewDashboardOutline,
+} from '@mdi/js'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const authStore = useAuthStore()
@@ -29,8 +37,10 @@ function logout() {
       <!-- top bar -->
 
       <div class="relative flex h-20 items-center">
-        <img src="@/assets/BamMinionsLogo.png" alt="Bam Minions" class="h-15 w-auto" />
-        <!-- Centered brand -->
+        <router-link :to="{ name: 'news-view' }" @click="open = false">
+          <img src="@/assets/BamMinionsLogo.png" alt="Bam Minions" class="h-15 w-auto" />
+        </router-link>
+
         <router-link
           :to="{ name: 'news-view' }"
           class="absolute left-1/2 -translate-x-1/2 flex items-center gap-5 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
@@ -63,25 +73,45 @@ function logout() {
 
             <!-- When logged IN -->
             <template v-else>
+              <!-- Admin button (separate) -->
               <router-link
                 :to="{ name: 'admin-user' }"
-                class="inline-flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
+                :aria-current="$route.name === 'admin-user' ? 'page' : undefined"
+                :class="[
+                  'inline-flex items-center justify-center rounded-lg p-2 transition',
+                  'hover:bg-white/10 active:bg-white/20 active:scale-95',
+                  $route.name === 'admin-user' ? 'bg-white/15 ring-1 ring-white/25' : '',
+                ]"
+                aria-label="Admin Users"
+                title="Admin Users"
               >
-                <SvgIcon type="mdi" :path="mdiAccount" class="h-5 w-5" />
+                <SvgIcon
+                  type="mdi"
+                  :path="mdiAccount"
+                  :class="[
+                    'h-5 w-5',
+                    $route.name === 'admin-user' ? 'text-yellow-400' : 'text-yellow-500',
+                  ]"
+                />
+              </router-link>
+
+              <div class="inline-flex items-center gap-3 rounded-lg px-3 py-2 text-sm">
                 <img
                   v-if="authStore.currentUserImage"
                   :src="authStore.currentUserImage"
                   alt="User Avatar"
                   class="h-8 w-8 rounded-full ring-1 ring-white/20 object-cover"
                 />
-                <span
+                <div
                   v-else
                   class="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-xs font-semibold ring-1 ring-white/20"
                 >
                   {{ userInitials }}
-                </span>
-                <span class="truncate max-w-[160px]">{{ authStore.currentUserName }}</span>
-              </router-link>
+                </div>
+                <span class="truncate max-w-[160px]"
+                  >{{ authStore.currentUserName }} {{ authStore.currentUserLastname }}</span
+                >
+              </div>
 
               <button
                 type="button"
@@ -144,7 +174,9 @@ function logout() {
             @click="open = false"
           >
             <SvgIcon type="mdi" :path="mdiAccount" class="h-5 w-5" />
-            <span class="truncate">{{ authStore.currentUserName }}</span>
+            <span class="truncate"
+              >{{ authStore.currentUserName }} {{ authStore.currentUserLastname }}</span
+            >
 
             <img
               v-if="authStore.currentUserImage"

@@ -46,14 +46,14 @@ function logout() {
             <!-- When logged OUT -->
             <template v-if="!isAuthed">
               <router-link
-                to="/register"
+                to="/auth/register"
                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
               >
                 <SvgIcon type="mdi" :path="mdiAccountPlus" class="h-5 w-5" />
                 <span>Sign Up</span>
               </router-link>
               <router-link
-                to="/login"
+                to="/auth/login"
                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
               >
                 <SvgIcon type="mdi" :path="mdiLogin" class="h-5 w-5" />

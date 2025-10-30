@@ -48,65 +48,77 @@ function saveNews() {
 </script>
 
 <template>
-  <!-- Full screen center -->
-  <div class="w-full flex items-center justify-center p-20 min-h-screen bg-gradient-to-b to-white">
-    <!-- Transparent card -->
-    <div class="w-full max-w-2xl rounded-2xl bg-white/10 backdrop-blur-md shadow-xl p-6">
-      <h1 class="text-5xl font-bold mb-4 text-center text-white p-10">Create your News</h1>
+  <!-- Center + compact padding -->
+  <div class="min-h-screen w-full bg-gradient-to-b px-3 py-10 grid place-items-center">
+    <div
+      class="w-full max-w-sm sm:max-w-md md:max-w-lg rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-xl p-4 sm:p-5"
+    >
+      <h1
+        class="text-center font-bold text-white tracking-tight text-2xl sm:text-3xl md:text-4xl mb-4"
+      >
+        Create your News
+      </h1>
 
-      <form @submit.prevent="saveNews" class="space-y-4 text-white">
-        <div class="space-y-1">
-          <label for="topic" class="block font-medium">Topic</label>
-          <input
-            id="topic"
-            v-model="news.topic"
-            type="text"
-            class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
-            placeholder="Headline"
-            required
-          />
+      <form @submit.prevent="saveNews" class="text-white">
+        <!-- 1 column on all screens (tighter) -->
+        <div class="grid grid-cols-1 gap-4">
+          <!-- Topic -->
+          <div class="space-y-1">
+            <label for="topic" class="block text-sm font-medium">Topic</label>
+            <input
+              id="topic"
+              v-model="news.topic"
+              type="text"
+              class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/30 placeholder-white/50"
+              placeholder="Headline"
+              required
+            />
+          </div>
+
+          <!-- Short detail -->
+          <div class="space-y-1">
+            <label for="shortDetail" class="block text-sm font-medium">Short detail</label>
+            <input
+              id="shortDetail"
+              v-model="news.shortDetail"
+              type="text"
+              class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/30 placeholder-white/50"
+              placeholder="One-line summary"
+              required
+            />
+          </div>
+
+          <!-- Detail -->
+          <div class="space-y-1">
+            <label for="detail" class="block text-sm font-medium">Detail</label>
+            <textarea
+              id="detail"
+              v-model="news.detail"
+              class="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/30 h-28 sm:h-32 overflow-y-auto resize-y [scrollbar-width:none] [-ms-overflow-style:'none'] [&::-webkit-scrollbar]:hidden placeholder-white/50"
+              placeholder="Write the full news content"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Images -->
+          <div class="space-y-1">
+            <label class="block text-sm font-medium">Images</label>
+            <ImageUpload v-model="news.image" />
+          </div>
         </div>
 
-        <div class="space-y-1 text-white">
-          <label for="shortDetail" class="block font-medium">Short detail</label>
-          <input
-            id="shortDetail"
-            v-model="news.shortDetail"
-            type="text"
-            class="w-full rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40"
-            placeholder="One-line summary"
-            required
-          />
-        </div>
-
-        <div class="space-y-1">
-          <label for="detail" class="block font-medium">Detail</label>
-          <textarea
-            id="detail"
-            v-model="news.detail"
-            class="w-full h-28 rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40 h-48 overflow-y-auto resize-y [scrollbar-width:none] [-ms-overflow-style:'none'] [&::-webkit-scrollbar]:hidden"
-            placeholder="Write the full news content"
-            required
-          ></textarea>
-        </div>
-
-        <div class="space-y-2">
-          <label class="block font-medium">Images</label>
-          <ImageUpload v-model="news.image" />
-        </div>
-
-        <div class="flex flex-col sm:flex-row justify-center gap-3 mt-6">
-          <!-- Submit -->
+        <!-- Actions: compact buttons -->
+        <div class="mt-6 grid grid-cols-2 gap-3">
           <button
-            class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-indigo-600 transition"
             type="submit"
+            class="w-full rounded-full px-4 py-2.5 text-sm font-semibold bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 active:scale-[0.99] transition"
           >
             Submit
           </button>
 
           <router-link
             :to="{ name: 'news-view' }"
-            class="w-full sm:w-auto min-w-[200px] px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-semibold bg-red-600 text-white text-center shadow-lg hover:bg-red-700 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 active:scale-[0.99] transition"
+            class="w-full rounded-full px-4 py-2.5 text-sm font-semibold bg-red-600 text-white text-center shadow-lg hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/70 active:scale-[0.99] transition"
           >
             Cancel
           </router-link>

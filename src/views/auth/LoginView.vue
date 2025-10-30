@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputText from '../../components/InputText.vue'
+import InputText from '@/components/InputText.vue'
 import * as yup from 'yup'
 import { useField, useForm } from 'vee-validate'
 import { useAuthStore } from '@/stores/auth.ts'

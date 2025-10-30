@@ -454,7 +454,6 @@ onMounted(() => {
         </router-link>
       </div>
 
-
       <div class="flex justify-center items-center gap-2 mt-4 select-none">
         <router-link
           v-if="hasPrev"

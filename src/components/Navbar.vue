@@ -3,14 +3,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SvgIcon from '@jamescoyle/vue-icon'
-import {
-  mdiAccountPlus,
-  mdiLogin,
-  mdiAccount,
-  mdiLogout,
-  mdiMenu,
-  mdiClose,
-} from '@mdi/js'
+import { mdiAccountPlus, mdiLogin, mdiAccount, mdiLogout, mdiMenu, mdiClose } from '@mdi/js'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const authStore = useAuthStore()
@@ -56,14 +49,14 @@ function logout() {
             <!-- When logged OUT -->
             <template v-if="!isAuthed">
               <router-link
-                to="/auth/register"
+                :to="{ name: 'register' }"
                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
               >
                 <SvgIcon type="mdi" :path="mdiAccountPlus" class="h-5 w-5" />
                 <span>Sign Up</span>
               </router-link>
               <router-link
-                to="/auth/login"
+                :to="{ name: 'login' }"
                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
               >
                 <SvgIcon type="mdi" :path="mdiLogin" class="h-5 w-5" />
@@ -149,7 +142,7 @@ function logout() {
       <div class="space-y-1 px-4 pb-4 pt-3">
         <template v-if="!isAuthed">
           <router-link
-            to="/register"
+            :to="{ name: 'register' }"
             class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
             @click="open = false"
           >
@@ -158,7 +151,7 @@ function logout() {
           </router-link>
 
           <router-link
-            to="/login"
+            :to="{ name: 'login' }"
             class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/10 transition"
             @click="open = false"
           >

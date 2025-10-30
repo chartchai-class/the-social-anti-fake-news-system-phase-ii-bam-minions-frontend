@@ -21,7 +21,7 @@ function handleDeleteComment() {
   <div class="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 space-y-3">
     <div class="flex items-start justify-between">
       <div class="flex items-start gap-3">
-        <div v-if="comment.usercomment.image?.length">
+        <div v-if="comment.usercomment?.image?.length">
           <img
             v-for="image in comment.usercomment.image"
             :key="image"

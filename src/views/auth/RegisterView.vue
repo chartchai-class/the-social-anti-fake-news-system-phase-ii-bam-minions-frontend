@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputText from '../../components/InputText.vue'
+import InputText from '@/components/InputText.vue'
 import ImageUpload from '@/components/ImageUpload.vue'
 import * as yup from 'yup'
 import { useField, useForm } from 'vee-validate'
@@ -38,19 +38,27 @@ const { value: email } = useField('email') as { value: Ref<string> }
 const { value: password } = useField('password') as { value: Ref<string> }
 const { value: image } = useField('image') as { value: Ref<string[]> }
 
-const onSubmit = handleSubmit((values: { firstname: string; lastname: string; email: string; password: string; image: string[] }) => {
-  authStore
-    .register(values.firstname, values.lastname, values.email, values.password, values.image)
-    .then(() => {
-      router.push({ name: 'news-view' })
-    })
-    .catch(() => {
-      messageStore.updateMessage('Could not register')
-      setTimeout(() => {
-        messageStore.resetMessage()
-      }, 3000)
-    })
-})
+const onSubmit = handleSubmit(
+  (values: {
+    firstname: string
+    lastname: string
+    email: string
+    password: string
+    image: string[]
+  }) => {
+    authStore
+      .register(values.firstname, values.lastname, values.email, values.password, values.image)
+      .then(() => {
+        router.push({ name: 'news-view' })
+      })
+      .catch(() => {
+        messageStore.updateMessage('Could not register')
+        setTimeout(() => {
+          messageStore.resetMessage()
+        }, 3000)
+      })
+  },
+)
 </script>
 
 <template>

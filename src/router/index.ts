@@ -86,19 +86,6 @@ const router = createRouter({
       name: 'add-news',
       component: NewFromView,
     },
-    {
-      path: '/admin',
-      name: 'admin-dashboard',
-      component: AdminDashboard,
-      props: (route) => {
-        const page = parseInt((route.query.page as string) || '1')
-        const pageSize = parseInt((route.query.pageSize as string) || '6')
-        return {
-          page: isNaN(page) ? 1 : page,
-          pageSize: isNaN(pageSize) ? 10 : pageSize,
-        }
-      },
-    },
 
     {
       path: '/admin',

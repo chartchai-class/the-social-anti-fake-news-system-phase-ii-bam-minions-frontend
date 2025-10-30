@@ -181,41 +181,50 @@ function onDeleteComment(commentId: number) {
     })
 }
 
+const nf = computed(() => Number(props.news?.notFakeCount) || 0)
+const f = computed(() => Number(props.news?.fakeCount) || 0)
+
+const isUnverified = computed(() => nf.value === 0 && f.value === 0) // ไม่มีโหวต
+const isTie = computed(() => !isUnverified.value && nf.value === f.value)
+const nfIsMajor = computed(() => nf.value > f.value)
+const fIsMajor = computed(() => f.value > nf.value)
+
+function buildClasses(baseColor: 'green' | 'red', isMajor: boolean) {
+  const size =
+    isUnverified.value || isTie.value || isMajor
+      ? 'px-4 py-2 text-[18px] md:text-[30px] shadow-lg'
+      : 'px-2 py-1 text-[14px] md:text-[16px]'
+
+  const ring = isUnverified.value
+    ? 'ring-4 ring-gray-400'
+    : isTie.value
+      ? 'ring-4 ring-yellow-400'
+      : isMajor
+        ? 'ring-2 ring-white/60'
+        : 'ring-1 ring-white/20'
+
+  const bg = baseColor === 'green' ? 'bg-green-600' : 'bg-red-600'
+
+  return [
+    'inline-flex items-center gap-2 rounded-md uppercase text-white transition-all duration-200 font-bold',
+    bg,
+    size,
+    ring,
+  ]
+}
+
+const nfClass = computed(() => buildClasses('green', nfIsMajor.value))
+const fClass = computed(() => buildClasses('red', fIsMajor.value))
+
 onMounted(() => {
   loadComments()
 })
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row justify-center px-2 sm:px-4 py-8 gap-8 lg:gap-6">
-    <!-- ===== Modal confirm delete comment ===== -->
-    <div
-      v-if="auth.isAdmin === true && showConfirm"
-      class="bg-gray-800 fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm text-white rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
-    >
-      <div class="text-sm font-semibold text-gray-200">Delete this comment?</div>
-
-      <div class="text-xs text-gray-400 break-words line-clamp-2">
-        {{ pendingDeletePreview }}
-      </div>
-
-      <div class="flex justify-end gap-2 text-xs font-medium">
-        <button
-          class="px-3 py-1.5 rounded-lg border border-gray-300 text-white hover:bg-gray-400"
-          @click="cancelDeleteComment"
-        >
-          Cancel
-        </button>
-        <button
-          class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700"
-          @click="confirmDeleteComment"
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-
-    <!-- ===== Toast notice ===== -->
+  <!-- BG gradient + center  -->
+  <div class="min-h-screen w-full bg-gradient-to-b px-3 sm:px-4 py-8 grid">
+    <!-- ===== Modals / Toast () ===== -->
     <div
       v-if="noticeVisible"
       class="fixed top-6 left-1/2 -translate-x-1/2 z-[3000] pointer-events-none"
@@ -228,168 +237,186 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- main article — wider frame on large screens -->
     <div
-      class="w-full lg:w-[86%] xl:w-[88%] <!-- ขยายความกว้างในจอใหญ่ --> max-w-[1400px] <!-- เพดานกว้างสุด --> rounded-2xl backdrop-blur shadow-xl border border-white p-0 sm:p-3"
+      v-if="auth.isAdmin === true && showConfirm"
+      class="bg-gray-800 fixed top-6 left-1/2 -translate-x-1/2 z-[3100] w-[90%] max-w-sm text-white rounded-xl shadow-xl border border-white p-4 flex flex-col gap-3"
     >
-      <!-- header/top badges -->
-      <div class="px-2 sm:px-4 pt-4 sm:pt-6 md:pt-8 pb-3 space-y-4">
-        <div class="flex flex-wrap items-center gap-2">
-          <span
-            class="inline-flex items-center rounded bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
-          >
-            Post by {{ news.reporter.firstname }} {{ news.reporter.lastname }}
-          </span>
-
-          <span
-            class="inline-flex items-center rounded bg-gray-100 text-gray-700 px-3 py-1 text-xs ring-1 ring-gray-200 font-bold text-[14px]"
-          >
-            Post on {{ news.created_at }}
-          </span>
-
-          <div
-            class="w-full sm:w-auto sm:ml-auto flex flex-wrap sm:flex-nowrap items-center gap-2 text-[12px] font-medium"
-          >
-            <div
-              class="inline-flex items-center gap-1 px-2 py-1 rounded uppercase bg-green-600 text-white"
-            >
-              <span class="tracking-wide font-bold text-[18px]">NOT FAKE</span>
-              <span class="text-[18px] font-semibold">{{ news.notFakeCount }}</span>
-            </div>
-
-            <div
-              class="inline-flex items-center gap-1 px-2 py-1 rounded uppercase bg-red-600 text-white"
-            >
-              <span class="tracking-wide font-bold text-[18px]">FAKE</span>
-              <span class="text-[18px] font-semibold">{{ news.fakeCount }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- news card — flush to frame on mobile -->
-      <div
-        class="bg-white rounded-lg border border-gray-200 shadow p-6 md:p-8 mb-6 mx-0 sm:mx-2 md:mx-4 xl:mx-6"
-      >
-        <!-- title -->
-        <div class="mb-6">
-          <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
-            {{ news.topic }}
-          </h1>
-        </div>
-
-        <!-- image -->
-        <div class="mb-6" v-if="news.image && news.image.length > 0">
-          <div class="w-full flex items-center justify-center overflow-hidden">
-            <img
-              :src="news.image[0]"
-              alt="News Image"
-              class="w-full h-auto max-h-[640px] object-contain"
-            />
-          </div>
-        </div>
-
-        <!-- short detail -->
-        <div class="mb-6">
-          <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
-            {{ news.shortDetail }}
-          </h2>
-        </div>
-
-        <!-- detail -->
-        <div class="pb-4">
-          <p class="text-gray-800 leading-relaxed whitespace-pre-line">
-            {{ news.detail }}
-          </p>
-        </div>
+      <div class="text-sm font-semibold text-gray-200">Delete this comment?</div>
+      <div class="text-xs text-gray-400 break-words line-clamp-2">{{ pendingDeletePreview }}</div>
+      <div class="flex justify-end gap-2 text-xs font-medium">
+        <button
+          class="px-3 py-1.5 rounded-lg border border-white/20 hover:bg-white/10"
+          @click="cancelDeleteComment"
+        >
+          Cancel
+        </button>
+        <button
+          class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700"
+          @click="confirmDeleteComment"
+        >
+          Delete
+        </button>
       </div>
     </div>
 
-    <!-- comments sidebar — slightly narrower so article gains space -->
-    <div class="w-full lg:w-[260px] xl:w-[280px] lg:ml-4 xl:ml-6 max-w-sm">
-      <h2 class="text-base md:text-lg font-bold tracking-tight text-white text-center py-2">
-        Comments
-      </h2>
+    <div
+      class="w-full max-w-[1400px] mx-auto rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-2xl p-4 sm:p-6 lg:p-8"
+    >
+      <!-- grid: main + sidebar -->
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8 lg:gap-6">
+        <!-- ===== main article ===== -->
+        <div class="w-full">
+          <!-- header/top badges -->
+          <div class="px-1 sm:px-2 pt-2 sm:pt-3 pb-3 space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="inline-flex items-center rounded bg-white/70 text-gray-800 px-3 py-1 text-xs ring-1 ring-white/40 font-bold text-[14px]"
+              >
+                Post by {{ news.reporter.firstname }} {{ news.reporter.lastname }}
+              </span>
+              <span
+                class="inline-flex items-center rounded bg-white/70 text-gray-800 px-3 py-1 text-xs ring-1 ring-white/40 font-bold text-[14px]"
+              >
+                Post on {{ news.created_at }}
+              </span>
 
-      <div class="space-y-3">
-        <CommentCard
-          v-for="c in comments"
-          :key="c.id"
-          :comment="c"
-          :isDeleting="deletingId === c.id"
-          :hasError="deleteErrorId === c.id"
-          :onRequestDelete="askDeleteComment"
-        />
-      </div>
+              <div
+                class="w-full sm:w-auto sm:ml-auto flex flex-wrap sm:flex-nowrap items-center gap-2 font-medium"
+              >
+                <!-- NOT FAKE -->
+                <div :class="nfClass">
+                  <span class="font-bold">NOT FAKE</span>
+                  <span class="font-semibold">{{ news.notFakeCount }}</span>
+                </div>
+                <!-- FAKE -->
+                <div :class="fClass">
+                  <span class="font-bold">FAKE</span>
+                  <span class="font-semibold">{{ news.fakeCount }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div class="mt-6">
-        <div class="flex justify-center text-sm font-medium text-gray-200 text-center flex-wrap">
-          Page {{ currentPage }} of {{ totalPages }}
-          <span v-if="totalComments">&nbsp;•&nbsp;{{ totalComments }} comments total</span>
+          <div class="bg-white rounded-xl border border-gray-200 shadow p-6 md:p-8 mb-6">
+            <!-- title -->
+            <div class="mb-6">
+              <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
+                {{ news.topic }}
+              </h1>
+            </div>
+
+            <!-- image -->
+            <div class="mb-6" v-if="news.image && news.image.length > 0">
+              <div class="w-full flex items-center justify-center overflow-hidden">
+                <img
+                  :src="news.image[0]"
+                  alt="News Image"
+                  class="block mx-auto w-full h-auto object-contain max-h-[60vh] lg:max-w-[820px] xl:max-w-[740px] 2xl:max-w-[700px]"
+                />
+              </div>
+            </div>
+
+            <!-- short detail -->
+            <div class="mb-6">
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
+                {{ news.shortDetail }}
+              </h2>
+            </div>
+
+            <!-- detail -->
+            <div class="pb-4">
+              <p class="text-gray-800 leading-relaxed whitespace-pre-line">
+                {{ news.detail }}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div class="mt-3 flex flex-wrap justify-center gap-2 select-none">
-          <router-link
-            v-for="num in pages"
-            :key="num"
-            :to="{
-              name: 'news-detail-view',
-              params: { id: news.id },
-              query: { page: num, pageSize: currentPageSize },
-            }"
-          >
-            <button
-              class="w-9 h-9 flex items-center justify-center rounded-full border transition"
-              :class="
-                num === currentPage
-                  ? 'bg-white text-black border-white'
-                  : 'bg-gray-500 text-white border-gray-700 hover:bg-gray-700'
-              "
-              :aria-current="num === currentPage ? 'page' : null"
-              :aria-label="`Go to page ${num}`"
-            >
-              {{ num }}
-            </button>
-          </router-link>
-        </div>
+        <!-- ===== comments sidebar ===== -->
+        <aside class="w-full max-w-[320px] justify-self-center lg:justify-self-start">
+          <h2 class="text-base md:text-lg font-bold tracking-tight text-white text-center py-2">
+            Comments
+          </h2>
 
-        <div class="mt-4 flex justify-center gap-3 select-none">
-          <!-- Prev -->
-          <router-link
-            v-if="hasPrev"
-            :to="{
-              name: 'news-detail-view',
-              params: { id: news.id },
-              query: { page: currentPage - 1, pageSize: currentPageSize },
-            }"
-            class="flex"
-          >
-            <button
-              class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hover:bg-gray-700 active:opacity-90 transition"
-              aria-label="Previous page"
-            >
-              ‹ Prev Page
-            </button>
-          </router-link>
+          <div class="space-y-3">
+            <CommentCard
+              v-for="c in comments"
+              :key="c.id"
+              :comment="c"
+              :isDeleting="deletingId === c.id"
+              :hasError="deleteErrorId === c.id"
+              :onRequestDelete="askDeleteComment"
+            />
+          </div>
 
-          <!-- Next -->
-          <router-link
-            v-if="hasNext"
-            :to="{
-              name: 'news-detail-view',
-              params: { id: news.id },
-              query: { page: currentPage + 1, pageSize: currentPageSize },
-            }"
-            class="flex"
-          >
-            <button
-              class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hovehover:bg-gray-700r:opacity-95 active:opacity-90 transition"
-              aria-label="Next page"
+          <div class="mt-6">
+            <div
+              class="flex justify-center text-sm font-medium text-white/90 text-center flex-wrap"
             >
-              Next Page ›
-            </button>
-          </router-link>
-        </div>
+              Page {{ currentPage }} of {{ totalPages }}
+              <span v-if="totalComments">&nbsp;•&nbsp;{{ totalComments }} comments total</span>
+            </div>
+
+            <div class="mt-3 flex flex-wrap justify-center gap-2 select-none">
+              <router-link
+                v-for="num in pages"
+                :key="num"
+                :to="{
+                  name: 'news-detail-view',
+                  params: { id: news.id },
+                  query: { page: num, pageSize: currentPageSize },
+                }"
+              >
+                <button
+                  class="w-9 h-9 flex items-center justify-center rounded-full border transition"
+                  :class="
+                    num === currentPage
+                      ? 'bg-white text-black border-white'
+                      : 'bg-white/10 text-white border-white/20 hover:bg-white/20'
+                  "
+                  :aria-current="num === currentPage ? 'page' : null"
+                  :aria-label="`Go to page ${num}`"
+                >
+                  {{ num }}
+                </button>
+              </router-link>
+            </div>
+
+            <div class="mt-4 flex justify-center gap-3 select-none">
+              <router-link
+                v-if="hasPrev"
+                :to="{
+                  name: 'news-detail-view',
+                  params: { id: news.id },
+                  query: { page: currentPage - 1, pageSize: currentPageSize },
+                }"
+                class="flex"
+              >
+                <button
+                  class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-white/20 hover:bg-white/10 active:opacity-90 transition"
+                >
+                  ‹ Prev Page
+                </button>
+              </router-link>
+
+              <router-link
+                v-if="hasNext"
+                :to="{
+                  name: 'news-detail-view',
+                  params: { id: news.id },
+                  query: { page: currentPage + 1, pageSize: currentPageSize },
+                }"
+                class="flex"
+              >
+                <button
+                  class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-white/20 hover:bg-white/10 active:opacity-90 transition"
+                >
+                  Next Page ›
+                </button>
+              </router-link>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   </div>

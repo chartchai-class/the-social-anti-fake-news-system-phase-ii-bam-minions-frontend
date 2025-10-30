@@ -54,7 +54,7 @@ const router = createRouter({
           component: NewsDetailView,
           props: (route) => ({
             page: parseInt((route.query.page as string) || '1'),
-            pageSize: parseInt((route.query.pageSize as string) || '5'),
+            pageSize: parseInt((route.query.pageSize as string) || '4'),
           }),
         },
         {

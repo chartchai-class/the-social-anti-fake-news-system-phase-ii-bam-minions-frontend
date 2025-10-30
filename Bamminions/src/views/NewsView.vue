@@ -249,20 +249,40 @@ onMounted(() => {
       <div ref="filtersRef" class="mb-4 flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-3">
         <!-- STATUS FILTER -->
         <div class="relative w-full sm:w-64 text-left">
+          <!-- trigger -->
           <button
             type="button"
             class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
             :aria-expanded="isStatusMenuOpen"
             @click.stop="toggleStatusMenu"
           >
-            <span>
-              <span v-if="statusFilter === ''">ALL</span>
-              <span v-else-if="statusFilter === 'FAKE'">FAKE</span>
-              <span v-else-if="statusFilter === 'NOT_FAKE'">NOT FAKE</span>
-              <span v-else-if="statusFilter === 'TIE'">TIE</span>
-              <span v-else-if="statusFilter === 'UNVERIFIED'">UNVERIFIED</span>
-              <span v-else>{{ statusFilter }}</span>
+            <span class="flex items-center gap-2">
+              <!-- new colors -->
+              <span
+                class="h-2.5 w-2.5 rounded-full"
+                :class="
+                  statusFilter === 'FAKE'
+                    ? 'bg-rose-500'
+                    : statusFilter === 'NOT_FAKE'
+                      ? 'bg-teal-500'
+                      : statusFilter === 'TIE'
+                        ? 'bg-orange-500'
+                        : statusFilter === 'UNVERIFIED'
+                          ? 'bg-purple-500'
+                          : 'bg-indigo-500' /* ALL */
+                "
+              ></span>
+
+              <span>
+                <span v-if="statusFilter === ''">ALL</span>
+                <span v-else-if="statusFilter === 'FAKE'">FAKE</span>
+                <span v-else-if="statusFilter === 'NOT_FAKE'">NOT FAKE</span>
+                <span v-else-if="statusFilter === 'TIE'">TIE</span>
+                <span v-else-if="statusFilter === 'UNVERIFIED'">UNVERIFIED</span>
+                <span v-else>{{ statusFilter }}</span>
+              </span>
             </span>
+
             <svg class="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
@@ -272,50 +292,62 @@ onMounted(() => {
             </svg>
           </button>
 
-          <!-- dropdown: full on mobile, same fixed width on sm+ -->
-          <div
-            v-if="isStatusMenuOpen"
-            class="absolute left-0 z-40 mt-2 w-full sm:w-64 rounded-md border bg-white shadow-lg ring-1 ring-black/5"
-          >
-            <ul class="py-1 text-sm text-gray-700">
+          <!-- panel -->
+          <div v-if="isStatusMenuOpen" class="absolute left-0 z-40 mt-2 w-50 rounded-md">
+            <ul class="text-sm text-gray-700">
               <li>
                 <button
-                  class="w-full text-left px-3 py-2 hover:bg-gray-100 font-semibold"
+                  class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
                   @click.stop="selectStatus('')"
                 >
-                  ALL
+                  <span class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
+                    <span>ALL</span>
+                  </span>
                 </button>
               </li>
               <li>
                 <button
-                  class="w-full text-left px-3 py-2 bg-red-600/90 hover:bg-red-600 text-white font-semibold"
+                  class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
                   @click.stop="selectStatus('FAKE')"
                 >
-                  FAKE
+                  <span class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
+                    <span>FAKE</span>
+                  </span>
                 </button>
               </li>
               <li>
                 <button
-                  class="w-full text-left px-3 py-2 bg-green-600/90 hover:bg-green-600 text-white font-semibold"
+                  class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
                   @click.stop="selectStatus('NOT_FAKE')"
                 >
-                  NOT FAKE
+                  <span class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-teal-500"></span>
+                    <span>NOT FAKE</span>
+                  </span>
                 </button>
               </li>
               <li>
                 <button
-                  class="w-full text-left px-3 py-2 bg-yellow-500/90 hover:bg-yellow-500 text-black font-semibold"
+                  class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
                   @click.stop="selectStatus('TIE')"
                 >
-                  TIE
+                  <span class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-orange-500"></span>
+                    <span>TIE</span>
+                  </span>
                 </button>
               </li>
               <li>
                 <button
-                  class="w-full text-left px-3 py-2 bg-gray-400/90 hover:bg-gray-400 text-black font-semibold"
+                  class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
                   @click.stop="selectStatus('UNVERIFIED')"
                 >
-                  UNVERIFIED
+                  <span class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-purple-500"></span>
+                    <span>UNVERIFIED</span>
+                  </span>
                 </button>
               </li>
             </ul>
@@ -326,7 +358,7 @@ onMounted(() => {
         <div class="relative w-full sm:w-64 text-left">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            class="inline-flex w-50 items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
             :aria-expanded="isPageSizeMenuOpen"
             @click.stop="togglePageSizeMenu"
           >
@@ -401,19 +433,21 @@ onMounted(() => {
       </div>
 
       <!-- row: page numbers -->
-      <div class="flex flex-wrap justify-center space-x-2 mt-4 select-none">
+      <div class="flex flex-wrap justify-center gap-2 mt-6 select-none">
         <router-link
           v-for="num in pages"
           :key="num"
           :to="{ name: 'news-view', query: { page: num, pageSize: pageSize } }"
         >
           <button
-            class="w-9 h-9 flex items-center justify-center border transition"
-            :class="[
+            class="inline-flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-black/20"
+            :class="
               num === page
-                ? ' text-black bg-white font-bold'
-                : ' text-gray-700 bg-gray-100 hover:bg-gray-400',
-            ]"
+                ? 'bg-gray text-white border-black'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+            "
+            :aria-current="num === page ? 'page' : null"
+            :aria-label="`Go to page ${num}`"
           >
             {{ num }}
           </button>
@@ -421,16 +455,17 @@ onMounted(() => {
       </div>
 
       <!-- row: prev / next -->
-      <div class="flex justify-center items-center mt-4 space-x-2 select-none">
+      <div class="flex justify-center items-center gap-2 mt-4 select-none">
         <router-link
           v-if="hasPrev"
           :to="{ name: 'news-view', query: { page: page - 1, pageSize: pageSize } }"
           class="flex items-center"
         >
           <button
-            class="min-w-[90px] h-9 flex items-center justify-center rounded border text-white hover:bg-gray-200 transition"
+            class="inline-flex h-9 min-w-[110px] items-center justify-center rounded-xl border px-3 text-sm font-medium shadow-sm transition focus:outline-none focus:ring-2 focus:ring-black/20 bg-black text-white border-black hover:opacity-95 active:opacity-90"
+            aria-label="Previous page"
           >
-            ‹ Prev Page
+            < Prev Page
           </button>
         </router-link>
 
@@ -440,9 +475,10 @@ onMounted(() => {
           class="flex items-center"
         >
           <button
-            class="min-w-[90px] h-9 flex items-center justify-center border rounded text-white hover:bg-gray-200 transition"
+            class="inline-flex h-9 min-w-[110px] items-center justify-center rounded-xl border px-3 text-sm font-medium shadow-sm transition focus:outline-none focus:ring-2 focus:ring-black/20 bg-black text-white border-black hover:opacity-95 active:opacity-90"
+            aria-label="Next page"
           >
-            Next Page ›
+            Next Page >
           </button>
         </router-link>
       </div>

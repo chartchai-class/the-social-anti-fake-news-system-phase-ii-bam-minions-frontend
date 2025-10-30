@@ -49,14 +49,12 @@ function saveNews() {
 
 <template>
   <!-- Full screen center -->
-  <div class="w-full flex items-center justify-center p-4 min-h-screen bg-gradient-to-b to-white">
+  <div class="w-full flex items-center justify-center p-20 min-h-screen bg-gradient-to-b to-white">
     <!-- Transparent card -->
-    <div
-      class="w-full max-w-2xl rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-xl p-6"
-    >
-      <h1 class="text-5xl font-bold mb-4 text-center">Create your News</h1>
+    <div class="w-full max-w-2xl rounded-2xl bg-white/10 backdrop-blur-md shadow-xl p-6">
+      <h1 class="text-5xl font-bold mb-4 text-center text-white p-10">Create your News</h1>
 
-      <form @submit.prevent="saveNews" class="space-y-4">
+      <form @submit.prevent="saveNews" class="space-y-4 text-white">
         <div class="space-y-1">
           <label for="topic" class="block font-medium">Topic</label>
           <input
@@ -69,7 +67,7 @@ function saveNews() {
           />
         </div>
 
-        <div class="space-y-1">
+        <div class="space-y-1 text-white">
           <label for="shortDetail" class="block font-medium">Short detail</label>
           <input
             id="shortDetail"
@@ -86,7 +84,7 @@ function saveNews() {
           <textarea
             id="detail"
             v-model="news.detail"
-            class="w-full h-28 resize-none overflow-y-auto no-scrollbar border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40 h-48 overflow-y-auto resize-y [scrollbar-width:none] [-ms-overflow-style:'none'] [&::-webkit-scrollbar]:hidden"
+            class="w-full h-28 rounded-lg border border-white/30 bg-white/5 px-3 py-2 outline-none focus:ring-2 focus:ring-white/40 h-48 overflow-y-auto resize-y [scrollbar-width:none] [-ms-overflow-style:'none'] [&::-webkit-scrollbar]:hidden"
             placeholder="Write the full news content"
             required
           ></textarea>

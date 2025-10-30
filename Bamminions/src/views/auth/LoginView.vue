@@ -43,64 +43,69 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Header block -->
-    <div class="text-center space-y-3">
-      <div class="flex flex-col items-center">
-        <!-- Logo badge -->
-        <img :src="bamminnionsLogo" alt="Brand Logo" class="w-20 h-20 object-contain" />
-        <!-- Headline -->
-        <h2 class="mt-4 text-lg font-extrabold text-gray-900">Welcome Bam Minions News</h2>
-        <div>
-          <p class="text-sm text-gray-500">Please log in to your account</p>
+  <div>
+    <div class="space-y-6">
+      <!-- Header block -->
+      <div class="text-center space-y-3">
+        <div class="flex flex-col items-center">
+          <!-- Logo badge -->
+          <img :src="bamminnionsLogo" alt="Brand Logo" class="w-20 h-20 object-contain" />
+          <!-- Headline -->
+          <h2 class="mt-4 text-lg font-extrabold text-gray-900">Welcome Bam Minions News</h2>
+          <div>
+            <p class="text-sm text-gray-500">Please log in to your account</p>
+          </div>
         </div>
       </div>
+
+      <!-- Form -->
+      <form class="space-y-5" @submit.prevent="onSubmit">
+        <!-- Email -->
+        <div class="flex flex-col gap-1">
+          <label for="email" class="text-sm font-medium text-gray-900"> Email </label>
+          <InputText
+            type="text"
+            id="email"
+            v-model="email"
+            placeholder="Email address"
+            :error="errors['email']"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center justify-between">
+            <label for="password" class="text-sm font-medium text-gray-900"> Password </label>
+          </div>
+
+          <InputText
+            type="password"
+            id="password"
+            v-model="password"
+            placeholder="Password"
+            :error="errors['password']"
+          />
+        </div>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          class="w-full inline-flex justify-center rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+        >
+          Sign In
+        </button>
+
+        <!-- helper text -->
+        <p class="text-center text-xs text-gray-500">
+          New here?
+          <RouterLink
+            :to="{ name: 'register' }"
+            class="font-semibold text-black hover:text-gray-700"
+          >
+            Create an account
+          </RouterLink>
+        </p>
+      </form>
     </div>
-
-    <!-- Form -->
-    <form class="space-y-5" @submit.prevent="onSubmit">
-      <!-- Email -->
-      <div class="flex flex-col gap-1">
-        <label for="email" class="text-sm font-medium text-gray-900"> Email </label>
-        <InputText
-          type="text"
-          id="email"
-          v-model="email"
-          placeholder="Email address"
-          :error="errors['email']"
-        />
-      </div>
-
-      <!-- Password -->
-      <div class="flex flex-col gap-1">
-        <div class="flex items-center justify-between">
-          <label for="password" class="text-sm font-medium text-gray-900"> Password </label>
-        </div>
-
-        <InputText
-          type="password"
-          id="password"
-          v-model="password"
-          placeholder="Password"
-          :error="errors['password']"
-        />
-      </div>
-
-      <!-- Button -->
-      <button
-        type="submit"
-        class="w-full inline-flex justify-center rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-      >
-        Sign In
-      </button>
-
-      <!-- helper text -->
-      <p class="text-center text-xs text-gray-500">
-        New here?
-        <RouterLink :to="{ name: 'register' }" class="font-semibold text-black hover:text-gray-700">
-          Create an account
-        </RouterLink>
-      </p>
-    </form>
   </div>
 </template>

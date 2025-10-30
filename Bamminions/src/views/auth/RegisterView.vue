@@ -6,6 +6,7 @@ import { useField, useForm } from 'vee-validate'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
+import bamminnionsLogo from '@/assets/BamMinionsLogo.png'
 
 const authStore = useAuthStore()
 const messageStore = useMessageStore()
@@ -52,7 +53,20 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
-  <form class="space-y-5" @submit.prevent="onSubmit">
+  <div class=""></div>
+  <div class="text-center space-y-3">
+    <div class="flex flex-col items-center">
+      <!-- Logo badge -->
+      <img :src="bamminnionsLogo" alt="Brand Logo" class="w-20 h-20 object-contain" />
+      <!-- Headline -->
+      <h2 class="mt-4 text-lg font-extrabold text-gray-900">Welcome Bam Minions News</h2>
+      <div>
+        <p class="text-sm text-gray-500">Please sign up to your account</p>
+      </div>
+    </div>
+  </div>
+
+  <form class="space-y-5 py-5" @submit.prevent="onSubmit">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- First Name -->
       <div class="flex flex-col gap-1">

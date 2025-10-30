@@ -77,6 +77,7 @@ function sendUpdate(rollback?: () => void) {
       // success: no toast or "Saved" state — the pill reverts to role label
       bus.reload()
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .catch((e: any) => {
       err.value = e?.response?.data?.message || e?.message || 'Update failed'
       rollback?.()

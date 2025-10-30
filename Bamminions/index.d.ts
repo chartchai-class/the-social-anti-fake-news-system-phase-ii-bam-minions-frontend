@@ -1,1 +1,4 @@
 declare module 'vue-media-upload';
+declare module 'yup';
+declare module 'vee-validate';
+declare module '@jamescoyle/vue-icon'

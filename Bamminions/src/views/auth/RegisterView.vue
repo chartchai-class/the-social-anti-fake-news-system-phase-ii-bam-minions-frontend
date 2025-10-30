@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import InputText from '@/components/InputText.vue'
+import InputText from '../../components/InputText.vue'
 import ImageUpload from '@/components/ImageUpload.vue'
 import * as yup from 'yup'
 import { useField, useForm } from 'vee-validate'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.ts'
 import { useRouter } from 'vue-router'
-import { useMessageStore } from '@/stores/message'
+import { useMessageStore } from '@/stores/message.ts'
 import bamminnionsLogo from '@/assets/BamMinionsLogo.png'
+import type { Ref } from 'vue'
 
 const authStore = useAuthStore()
 const messageStore = useMessageStore()
@@ -31,13 +32,13 @@ const { errors, handleSubmit } = useForm({
   },
 })
 
-const { value: firstname } = useField<string>('firstname')
-const { value: lastname } = useField<string>('lastname')
-const { value: email } = useField<string>('email')
-const { value: password } = useField<string>('password')
-const { value: image } = useField<string[]>('image')
+const { value: firstname } = useField('firstname') as { value: Ref<string> }
+const { value: lastname } = useField('lastname') as { value: Ref<string> }
+const { value: email } = useField('email') as { value: Ref<string> }
+const { value: password } = useField('password') as { value: Ref<string> }
+const { value: image } = useField('image') as { value: Ref<string[]> }
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit((values: { firstname: string; lastname: string; email: string; password: string; image: string[] }) => {
   authStore
     .register(values.firstname, values.lastname, values.email, values.password, values.image)
     .then(() => {

@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 
 const props = defineProps<{ page: number; pageSize: number; filter: string }>()
 const router = useRouter()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const items = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)

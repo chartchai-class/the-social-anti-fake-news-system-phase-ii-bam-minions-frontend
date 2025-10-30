@@ -3,6 +3,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import NewsService from '@/services/NewsService'
 
 const props = defineProps<{ newsId: number; page: number; pageSize: number }>()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const items = ref<any[]>([])
 const total = ref(0)
 const loading = ref(false)

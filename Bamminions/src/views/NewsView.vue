@@ -446,7 +446,7 @@ onMounted(() => {
                 ? 'bg-white text-black border-white'
                 : 'bg-gray-500 text-white border-gray-700 hover:bg-gray-700'
             "
-            :aria-current="num === page ? 'page' : null"
+            :aria-current="num === page ? 'page' : undefined"
             :aria-label="`Go to page ${num}`"
           >
             {{ num }}
@@ -454,7 +454,7 @@ onMounted(() => {
         </router-link>
       </div>
 
-      <!-- row: prev / next -->
+
       <div class="flex justify-center items-center gap-2 mt-4 select-none">
         <router-link
           v-if="hasPrev"
@@ -465,7 +465,7 @@ onMounted(() => {
             class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hover:bg-gray-700 active:opacity-90 transition"
             aria-label="Previous page"
           >
-            < Prev Page
+            &lt; Prev Page
           </button>
         </router-link>
 

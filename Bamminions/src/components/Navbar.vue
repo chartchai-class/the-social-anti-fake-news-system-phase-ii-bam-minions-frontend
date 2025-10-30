@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -9,7 +10,6 @@ import {
   mdiLogout,
   mdiMenu,
   mdiClose,
-  mdiViewDashboardOutline,
 } from '@mdi/js'
 import { useAuthStore } from '@/stores/auth.ts'
 
@@ -97,8 +97,8 @@ function logout() {
 
               <div class="inline-flex items-center gap-3 rounded-lg px-3 py-2 text-sm">
                 <img
-                  v-if="authStore.currentUserImage"
-                  :src="authStore.currentUserImage"
+                  v-if="authStore.user?.image"
+                  :src="authStore.user.image[0]"
                   alt="User Avatar"
                   class="h-8 w-8 rounded-full ring-1 ring-white/20 object-cover"
                 />
@@ -179,8 +179,8 @@ function logout() {
             >
 
             <img
-              v-if="authStore.currentUserImage"
-              :src="authStore.currentUserImage"
+              v-if="authStore.user?.image"
+              :src="authStore.user.image[0]"
               alt="User Avatar"
               class="ml-auto h-8 w-8 rounded-full ring-1 ring-white/20 object-cover"
             />

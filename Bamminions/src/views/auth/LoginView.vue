@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import InputText from '@/components/InputText.vue'
+import InputText from '../../components/InputText.vue'
 import * as yup from 'yup'
 import { useField, useForm } from 'vee-validate'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.ts'
 import { useRouter, RouterLink } from 'vue-router'
-import { useMessageStore } from '@/stores/message'
+import { useMessageStore } from '@/stores/message.ts'
 import bamminnionsLogo from '@/assets/BamMinionsLogo.png'
+import type { Ref } from 'vue'
 
 const authStore = useAuthStore()
 const messageStore = useMessageStore()
@@ -24,10 +25,10 @@ const { errors, handleSubmit } = useForm({
   },
 })
 
-const { value: email } = useField<string>('email')
-const { value: password } = useField<string>('password')
+const { value: email } = useField('email') as { value: Ref<string> }
+const { value: password } = useField('password') as { value: Ref<string> }
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit((values: { email: string; password: string }) => {
   authStore
     .login(values.email, values.password)
     .then(() => {

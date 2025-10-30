@@ -37,7 +37,7 @@ export interface UserReporter {
   email: string
   image: string[]
 }
-
+ 
 export interface VoteRequest {
   label: VoteLabel
   content: string
@@ -63,6 +63,7 @@ export type AdminUser = {
   lastname: string
   username: string
   email: string
+  image: string[]
   roles: Role[]
   enabled: boolean
   created_at: string

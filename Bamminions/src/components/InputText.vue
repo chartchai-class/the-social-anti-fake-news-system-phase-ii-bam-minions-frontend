@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import UniqueID from '@/features/UniqueID'
-import ErrorMessage from '@/components/ErrorMessage.vue'
+// @ts-expect-ignore: module has no type declarations
+import UniqueID from '@/features/UniqueID.ts'
+import ErrorMessage from './ErrorMessage.vue'
 import { computed } from 'vue'
 
 const modelValue = defineModel<string>()

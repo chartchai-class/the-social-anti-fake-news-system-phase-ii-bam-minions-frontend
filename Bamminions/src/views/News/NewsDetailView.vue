@@ -374,7 +374,7 @@ onMounted(() => {
                       ? 'bg-white text-black border-white'
                       : 'bg-white/10 text-white border-white/20 hover:bg-white/20'
                   "
-                  :aria-current="num === currentPage ? 'page' : null"
+                  :aria-current="num === currentPage ? 'page' : undefined"
                   :aria-label="`Go to page ${num}`"
                 >
                   {{ num }}

@@ -1,4 +1,4 @@
-import type { AxiosResponse } from 'axios'
+
 import apiClient from '@/services/AxiosCLient'
 import type { Role } from '@/types'
 

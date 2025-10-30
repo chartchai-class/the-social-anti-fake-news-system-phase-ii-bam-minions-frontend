@@ -6,13 +6,12 @@ import { useField, useForm } from 'vee-validate'
 import type { News, VoteLabel, VoteRequest } from '@/types'
 import { useRouter } from 'vue-router'
 import { useNewsStore } from '@/stores/new'
-import { onMounted } from 'vue'
+import { onMounted, type Ref } from 'vue'
 
 const props = defineProps<{ news: News }>()
 
 const validationSchema = yup.object({
-  label: yup.mixed<VoteLabel>().oneOf(['FAKE', 'NOT_FAKE'], 'Vote is required'),
-  // optional, but validate length a bit
+  label: yup.mixed().oneOf(['FAKE', 'NOT_FAKE'], 'Vote is required'),
   content: yup.string().max(500, 'Max 500 characters'),
   image: yup.array(yup.string()),
 })
@@ -27,16 +26,16 @@ const { errors, handleSubmit } = useForm({
   },
 })
 
-const { value: label } = useField<VoteLabel>('label')
-const { value: comment } = useField<string>('content')
-const { value: image } = useField<string[]>('image')
+const { value: label } = useField('label') as { value: Ref<VoteLabel> }
+const { value: comment } = useField('content') as { value: Ref<string> }
+const { value: image } = useField('image') as { value: Ref<string[]> }
 
 function choose(value: VoteLabel) {
   label.value = value
 }
 
 const newsStore = useNewsStore()
-const submit = handleSubmit((value) => {
+const submit = handleSubmit((value: { label: VoteLabel; content: string; image: string[] }) => {
   const payload: VoteRequest = {
     label: value.label as VoteLabel,
     content: value.content || '',

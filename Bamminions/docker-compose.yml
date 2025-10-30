@@ -1,0 +1,5 @@
+services:
+  web:
+    image: "kengchayodom/se331-frontend:latest"
+    ports:
+      - 8001:80

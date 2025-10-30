@@ -1,7 +1,7 @@
 import LoginView from '@/views/auth/LoginView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
 import NewsView from '@/views/NewsView.vue'
-import NewsDetailView from '@/views/News/NewsDetailView.vue'
+import NewsDetailView from '@/views/NewsDetailView.vue'
 import NewsService from '@/services/NewsService'
 import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'

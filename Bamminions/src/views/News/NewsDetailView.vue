@@ -191,17 +191,17 @@ onMounted(() => {
     <!-- ===== Modal confirm delete comment ===== -->
     <div
       v-if="auth.isAdmin === true && showConfirm"
-      class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm bg-white text-gray-900 rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
+      class="bg-gray-800 fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm text-white rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
     >
-      <div class="text-sm font-semibold text-gray-800">Delete this comment?</div>
+      <div class="text-sm font-semibold text-gray-200">Delete this comment?</div>
 
-      <div class="text-xs text-gray-600 break-words line-clamp-2">
+      <div class="text-xs text-gray-400 break-words line-clamp-2">
         {{ pendingDeletePreview }}
       </div>
 
       <div class="flex justify-end gap-2 text-xs font-medium">
         <button
-          class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+          class="px-3 py-1.5 rounded-lg border border-gray-300 text-white hover:bg-gray-400"
           @click="cancelDeleteComment"
         >
           Cancel
@@ -328,9 +328,32 @@ onMounted(() => {
           <span v-if="totalComments">&nbsp;•&nbsp;{{ totalComments }} comments total</span>
         </div>
 
-        <div
-          class="flex flex-col sm:flex-row justify-center items-center mt-8 sm:space-x-2 space-y-4 sm:space-y-0 select-none text-xs"
-        >
+        <div class="mt-3 flex flex-wrap justify-center gap-2 select-none">
+          <router-link
+            v-for="num in pages"
+            :key="num"
+            :to="{
+              name: 'news-detail-view',
+              params: { id: news.id },
+              query: { page: num, pageSize: currentPageSize },
+            }"
+          >
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded-full border transition"
+              :class="
+                num === currentPage
+                  ? 'bg-white text-black border-white'
+                  : 'bg-gray-500 text-white border-gray-700 hover:bg-gray-700'
+              "
+              :aria-current="num === currentPage ? 'page' : null"
+              :aria-label="`Go to page ${num}`"
+            >
+              {{ num }}
+            </button>
+          </router-link>
+        </div>
+
+        <div class="mt-4 flex justify-center gap-3 select-none">
           <!-- Prev -->
           <router-link
             v-if="hasPrev"
@@ -339,38 +362,15 @@ onMounted(() => {
               params: { id: news.id },
               query: { page: currentPage - 1, pageSize: currentPageSize },
             }"
-            class="flex items-center"
+            class="flex"
           >
             <button
-              class="min-w-[90px] h-9 flex items-center justify-center rounded border text-white hover:bg-gray-200 hover:text-black transition"
+              class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hover:bg-gray-700 active:opacity-90 transition"
+              aria-label="Previous page"
             >
               ‹ Prev Page
             </button>
           </router-link>
-
-          <!-- page numbers -->
-          <div class="flex flex-wrap justify-center space-x-2 mx-2">
-            <router-link
-              v-for="num in pages"
-              :key="num"
-              :to="{
-                name: 'news-detail-view',
-                params: { id: news.id },
-                query: { page: num, pageSize: currentPageSize },
-              }"
-            >
-              <button
-                class="w-9 h-9 flex items-center justify-center border transition"
-                :class="[
-                  num === currentPage
-                    ? 'text-black bg-white font-bold'
-                    : 'text-gray-200 bg-gray-700 hover:bg-gray-500',
-                ]"
-              >
-                {{ num }}
-              </button>
-            </router-link>
-          </div>
 
           <!-- Next -->
           <router-link
@@ -380,10 +380,11 @@ onMounted(() => {
               params: { id: news.id },
               query: { page: currentPage + 1, pageSize: currentPageSize },
             }"
-            class="flex items-center"
+            class="flex"
           >
             <button
-              class="min-w-[90px] h-9 flex items-center justify-center border rounded text-white hover:bg-gray-200 hover:text-black transition"
+              class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hovehover:bg-gray-700r:opacity-95 active:opacity-90 transition"
+              aria-label="Next page"
             >
               Next Page ›
             </button>

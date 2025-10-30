@@ -1,7 +1,6 @@
 import LoginView from '@/views/auth/LoginView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
 import NewsView from '@/views/NewsView.vue'
-import NewsDetailView from '@/views/NewsDetailView.vue'
 import NewsService from '@/services/NewsService'
 import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -13,6 +12,7 @@ import AdminNewsListView from '@/views/Admin/AdminNewsListView.vue'
 import AdminCommentsView from '@/views/Admin/AdminCommentsView.vue'
 import AdminUserView from '@/views/Admin/AdminUserView.vue'
 import AuthLayout from '@/views/auth/AuthLayout.vue'
+import NewsDetailView from '@/views/News/NewsDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

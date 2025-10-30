@@ -195,9 +195,9 @@ onMounted(() => {
     v-if="showConfirm"
     class="bg-gray-800 fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm text-gray-900 rounded-xl shadow-xl border border-gray-200 p-4 flex flex-col gap-3"
   >
-    <div class="text-sm font-semibold text-white">Delete this news?</div>
+    <div class="text-sm font-semibold text-gray-200">Delete this news?</div>
 
-    <div class="text-xs text-white break-words line-clamp-2">
+    <div class="text-xs text-gray-400 break-words line-clamp-2">
       {{ pendingDeleteTitle }}
     </div>
 
@@ -262,13 +262,13 @@ onMounted(() => {
                 class="h-2.5 w-2.5 rounded-full"
                 :class="
                   statusFilter === 'FAKE'
-                    ? 'bg-rose-500'
+                    ? 'bg-red-600'
                     : statusFilter === 'NOT_FAKE'
-                      ? 'bg-teal-500'
+                      ? 'bg-green-600'
                       : statusFilter === 'TIE'
-                        ? 'bg-orange-500'
+                        ? 'bg-yellow-600'
                         : statusFilter === 'UNVERIFIED'
-                          ? 'bg-purple-500'
+                          ? 'bg-gray-400'
                           : 'bg-indigo-500' /* ALL */
                 "
               ></span>
@@ -312,7 +312,7 @@ onMounted(() => {
                   @click.stop="selectStatus('FAKE')"
                 >
                   <span class="flex items-center gap-2">
-                    <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-red-600"></span>
                     <span>FAKE</span>
                   </span>
                 </button>
@@ -323,7 +323,7 @@ onMounted(() => {
                   @click.stop="selectStatus('NOT_FAKE')"
                 >
                   <span class="flex items-center gap-2">
-                    <span class="h-2.5 w-2.5 rounded-full bg-teal-500"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-green-600"></span>
                     <span>NOT FAKE</span>
                   </span>
                 </button>
@@ -334,7 +334,7 @@ onMounted(() => {
                   @click.stop="selectStatus('TIE')"
                 >
                   <span class="flex items-center gap-2">
-                    <span class="h-2.5 w-2.5 rounded-full bg-orange-500"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-yellow-400"></span>
                     <span>TIE</span>
                   </span>
                 </button>
@@ -345,7 +345,7 @@ onMounted(() => {
                   @click.stop="selectStatus('UNVERIFIED')"
                 >
                   <span class="flex items-center gap-2">
-                    <span class="h-2.5 w-2.5 rounded-full bg-purple-500"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-gray-400"></span>
                     <span>UNVERIFIED</span>
                   </span>
                 </button>
@@ -358,7 +358,7 @@ onMounted(() => {
         <div class="relative w-full sm:w-64 text-left">
           <button
             type="button"
-            class="inline-flex w-50 items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            class="inline-flex w-full items-center justify-between gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
             :aria-expanded="isPageSizeMenuOpen"
             @click.stop="togglePageSizeMenu"
           >
@@ -443,8 +443,8 @@ onMounted(() => {
             class="inline-flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-black/20"
             :class="
               num === page
-                ? 'bg-gray text-white border-black'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+                ? 'bg-white text-black border-white'
+                : 'bg-gray-500 text-white border-gray-700 hover:bg-gray-700'
             "
             :aria-current="num === page ? 'page' : null"
             :aria-label="`Go to page ${num}`"
@@ -462,7 +462,7 @@ onMounted(() => {
           class="flex items-center"
         >
           <button
-            class="inline-flex h-9 min-w-[110px] items-center justify-center rounded-xl border px-3 text-sm font-medium shadow-sm transition focus:outline-none focus:ring-2 focus:ring-black/20 bg-black text-white border-black hover:opacity-95 active:opacity-90"
+            class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hover:bg-gray-700 active:opacity-90 transition"
             aria-label="Previous page"
           >
             < Prev Page
@@ -475,7 +475,7 @@ onMounted(() => {
           class="flex items-center"
         >
           <button
-            class="inline-flex h-9 min-w-[110px] items-center justify-center rounded-xl border px-3 text-sm font-medium shadow-sm transition focus:outline-none focus:ring-2 focus:ring-black/20 bg-black text-white border-black hover:opacity-95 active:opacity-90"
+            class="inline-flex h-10 min-w-[120px] items-center justify-center rounded-xl px-3 text-sm font-medium bg-black text-white border border-black hover:bg-gray-700 active:opacity-90 transition"
             aria-label="Next page"
           >
             Next Page >

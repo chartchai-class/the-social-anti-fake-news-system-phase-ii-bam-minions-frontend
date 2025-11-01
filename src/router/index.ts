@@ -5,6 +5,7 @@ import NewsService from '@/services/NewsService'
 import { useNewsStore } from '@/stores/new'
 import { createRouter, createWebHistory } from 'vue-router'
 import NewsLayoutView from '@/views/News/NewsLayoutView.vue'
+import nProgress from 'nprogress'
 import NewsVoteView from '@/views/News/NewsVoteView.vue'
 import NewFromView from '@/views/form/NewFromView.vue'
 import AdminDashboard from '@/views/Admin/AdminDashboard.vue'
@@ -153,6 +154,14 @@ const router = createRouter({
       ],
     },
   ],
+})
+
+router.beforeEach(() => {
+  nProgress.start()
+})
+
+router.afterEach(() => {
+  nProgress.done()
 })
 
 export default router
